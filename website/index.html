@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-theme-setting="system">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Move AI — Predicting Student Performance Through Learning Interaction History</title>
+    <meta name="description" content="An educational machine learning system for predicting interaction-level student success on the ASSISTments dataset using chronological feature engineering and gradient boosting.">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- KaTeX Mathematical Typesetting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- Sticky Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="#hero" class="brand-logo">
+                <span>Next Move AI</span>
+                <span class="brand-badge">ES 335</span>
+            </a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#problem">Formulation</a></li>
+                    <li><a href="#dataset">Dataset</a></li>
+                    <li><a href="#validation">Validation</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#experiments">Experiments</a></li>
+                    <li><a href="#evaluation">Evaluation</a></li>
+                    <li><a href="#threshold-explorer">Threshold</a></li>
+                    <li><a href="#simulator">Simulator</a></li>
+                    <li><a href="#model-explorer">Model Explorer</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <!-- Theme Switcher (Light / Dark / System) -->
+                <div class="theme-switch-group" role="group" aria-label="Theme selector">
+                    <button type="button" class="theme-btn" data-theme-val="light" title="Light theme">☀️ Light</button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" title="Dark theme">🌙 Dark</button>
+                    <button type="button" class="theme-btn active" data-theme-val="system" title="System default">💻 Auto</button>
+                </div>
+                <button type="button" class="mobile-nav-toggle" aria-label="Toggle navigation menu">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section 1: Hero -->
+    <section id="hero" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <span>🎓 ES 335: Machine Learning</span>
+                    <span>•</span>
+                    <span>ASSISTments 2009–2010</span>
+                </div>
+                <h1>Next Move AI</h1>
+                <p class="hero-subtitle">Predicting Student Performance Through Learning Interaction History</p>
+                <p class="hero-desc">
+                    An educational machine learning system that predicts whether a student's next eligible main-question interaction will be answered correctly or non-correctly, conditioned strictly on chronological learning history, skill proficiency, and question difficulty.
+                </p>
+                <div class="hero-actions">
+                    <a href="#simulator" class="btn btn-primary">Try Student Simulator →</a>
+                    <a href="#threshold-explorer" class="btn btn-secondary">Explore Risk Threshold</a>
+                    <a href="#evaluation" class="btn btn-secondary">View Test Results</a>
+                </div>
+                <div class="hero-meta-grid">
+                    <div class="hero-meta-item">
+                        <h5>Selected Model</h5>
+                        <p>XGBoost (500 Trees)</p>
+                    </div>
+                    <div class="hero-meta-item">
+                        <h5>Test ROC-AUC</h5>
+                        <p>0.7468</p>
+                    </div>
+                    <div class="hero-meta-item">
+                        <h5>Risk Recall @ τ = 0.2880</h5>
+                        <p>74.72%</p>
+                    </div>
+                    <div class="hero-meta-item">
+                        <h5>Partitioning</h5>
+                        <p>Student-Disjoint 80/20</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Problem Formulation -->
+    <section id="problem">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Theoretical Foundation</span>
+                <h2 class="section-title">Problem Formulation</h2>
+                <p class="section-subtitle">Formal mathematical definition of interaction-level outcome and failure risk prediction.</p>
+            </div>
+
+            <div class="callout-disclaimer">
+                <strong>Academic Scope Notice:</strong> Next Move AI predicts the outcome of an <em>individual question interaction</em> on an online tutoring platform. It does <strong>not</strong> measure overall student intelligence, cumulative cognitive mastery, or grade-point average. Observational predictive relationships do not establish causal pedagogical mechanisms.
+            </div>
+
+            <div class="calc-container" style="margin-bottom: 0;">
+                <div>
+                    <h3 style="margin-bottom: 14px;">Sequence Formulation</h3>
+                    <p style="margin-bottom: 12px; color: var(--text-secondary);">
+                        Let \(s \in \mathcal{S}\) index a student and let \(t\) index their chronological interaction sequence, ordered globally by <code>order_id</code>.
+                    </p>
+                    <ul style="padding-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Input Vector \(\mathbf{x}_{s,t}\):</strong> Constructed strictly from interactions prior to \(t\) (\(\text{order\_id} < \text{order\_id}_{s,t}\)).</li>
+                        <li><strong>Binary Target \(y_{s,t} \in \{0, 1\}\):</strong> Recorded outcome on the question (\(1 =\) correct, \(0 =\) non-correct).</li>
+                        <li><strong>Predicted Correct Probability:</strong>
+                            <div style="margin: 8px 0; font-size: 1.15rem; color: var(--brand-blue);">
+                                \[\hat{p}_{s,t} = P(y_{s,t} = 1 \mid \mathbf{x}_{s,t})\]
+                            </div>
+                        </li>
+                        <li><strong>Complementary Failure Risk:</strong>
+                            <div style="margin: 8px 0; font-size: 1.15rem; color: var(--brand-amber);">
+                                \[r_{s,t} = 1 - \hat{p}_{s,t} = P(y_{s,t} = 0 \mid \mathbf{x}_{s,t})\]
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 14px;">Interaction-Level vs. Student-Level</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 14px;">
+                        Unlike static student proficiency ratings, interaction-level risk varies dynamically from question to question:
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="card" style="padding: 16px; border-left: 4px solid var(--brand-emerald);">
+                            <h5 style="margin-bottom: 4px;">Low Predicted Risk (High Probability of Success)</h5>
+                            <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                                Occurs when a student practices a familiar, mastered skill on an elementary or well-scaffolded problem.
+                            </p>
+                        </div>
+                        <div class="card" style="padding: 16px; border-left: 4px solid var(--brand-rose);">
+                            <h5 style="margin-bottom: 4px;">High Predicted Risk (Potential Failure Trigger)</h5>
+                            <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                                Occurs when even a high-performing student encounters a difficult, unfamiliar multi-skill problem (\(r_{s,t} \ge \tau\)).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Dataset Explorer -->
+    <section id="dataset">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Data Architecture</span>
+                <h2 class="section-title">Dataset Explorer</h2>
+                <p class="section-subtitle">ASSISTments 2009–2010 Skill Builder dataset dimensions, schema, and cleaning audit.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Raw Interactions</div>
+                    <div class="stat-value">346,860</div>
+                    <div class="stat-subtext">31 original platform columns</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Cleaned Main Questions</div>
+                    <div class="stat-value">275,458</div>
+                    <div class="stat-subtext">Retained 8 modeling columns</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Unique Students</div>
+                    <div class="stat-value">4,217</div>
+                    <div class="stat-subtext">Middle-school math learners</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Unique Problems</div>
+                    <div class="stat-value">26,688</div>
+                    <div class="stat-subtext">17,611 in training pool</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Scaffolding Excluded</div>
+                    <div class="stat-value">71,402</div>
+                    <div class="stat-subtext">Sub-questions (original == 0)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Missing Skill Tags</div>
+                    <div class="stat-value">16,059</div>
+                    <div class="stat-subtext">5.83% of main questions</div>
+                </div>
+            </div>
+
+            <!-- Visual Charts -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h4 class="card-title">Cleaned Outcome Distribution</h4>
+                        <p class="card-desc">Target label balance across 275,458 eligible interactions.</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-class-balance"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h4 class="card-title">Question Presentation Formats</h4>
+                        <p class="card-desc">Categorical distribution of answer formats (log scale).</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-answer-types"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Validation Strategy & Data Splitting -->
+    <section id="validation">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Methodology & Leakage Prevention</span>
+                <h2 class="section-title">Validation Strategy & Data Splitting</h2>
+                <p class="section-subtitle">A three-stage, student-disjoint architecture guaranteeing zero identity leakage across cross-validation and held-out testing.</p>
+            </div>
+
+            <!-- Unified Color Legend -->
+            <div class="val-legend-bar">
+                <span class="val-legend-title">Evaluation Partitions:</span>
+                <div class="val-legend-item">
+                    <span class="val-swatch swatch-train"></span>
+                    <span><strong>Training Pool (80% / 4 Folds):</strong> Feature engineering, prior estimation, scaling & model training</span>
+                </div>
+                <div class="val-legend-item">
+                    <span class="val-swatch swatch-val"></span>
+                    <span><strong>Validation Folds (1 Fold Rotating):</strong> Out-of-fold scoring, model selection & threshold calibration</span>
+                </div>
+                <div class="val-legend-item">
+                    <span class="val-swatch swatch-test"></span>
+                    <span><strong>Held-Out Test Set (20% Isolated):</strong> Final unbiased evaluation; zero modeling exposure</span>
+                </div>
+            </div>
+
+            <!-- Three-Stage Validation Architecture Pipeline -->
+            <div class="val-stages-grid">
+                <div class="val-stage-card">
+                    <span class="val-stage-badge stage-1">Stage 1</span>
+                    <h3 class="val-stage-title">Student-Level Train-Test Split</h3>
+                    <p class="val-stage-desc">
+                        Initial 80:20 partition executed strictly at the student level using <code>random_state=42</code>. Partitions are completely student-disjoint to ensure genuine out-of-sample generalization to new learners.
+                    </p>
+                    <div class="val-stage-stats">
+                        <span>Train Pool: <strong>3,373 students</strong></span>
+                        <span>Held-Out: <strong>844 students</strong></span>
+                    </div>
+                </div>
+
+                <div class="val-stage-card">
+                    <span class="val-stage-badge stage-2">Stage 2</span>
+                    <h3 class="val-stage-title">Five-Fold Student Cross-Validation</h3>
+                    <p class="val-stage-desc">
+                        Performed exclusively within the 80% training pool via <code>KFold(n_splits=5, shuffle=True, random_state=42)</code>. Four folds train while one fold validates across 5 iterations, producing 219,983 out-of-fold predictions.
+                    </p>
+                    <div class="val-stage-stats">
+                        <span>Iterations: <strong>5 Rounds</strong></span>
+                        <span>OOF Pool: <strong>219,983 interactions</strong></span>
+                    </div>
+                </div>
+
+                <div class="val-stage-card">
+                    <span class="val-stage-badge stage-3">Stage 3</span>
+                    <h3 class="val-stage-title">Final Model & Unbiased Test</h3>
+                    <p class="val-stage-desc">
+                        Architecture selection and threshold calibration (\(\tau = 0.2880\)) finalized via CV. The final XGBoost pipeline is fit on all 3,373 training-pool students and evaluated once on the untouched 20% test set.
+                    </p>
+                    <div class="val-stage-stats">
+                        <span>Final Model: <strong>XGBoost (500 Trees)</strong></span>
+                        <span>Test Set: <strong>55,475 interactions</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 1 Deep Dive: 80:20 Student Split Diagram Card -->
+            <div class="split-diagram-card">
+                <div class="card-header" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <h3 class="card-title" style="margin-bottom: 0;">Stage 1: Student-Level Train-Test Partitioning</h3>
+                        <span class="badge badge-neutral">Seed: random_state = 42</span>
+                    </div>
+                    <p class="card-desc">
+                        The 4,217 students are partitioned into non-overlapping groups. Every interaction of a student is assigned entirely to either the training pool or the test set.
+                    </p>
+                </div>
+
+                <!-- Visual 80:20 Split Bar -->
+                <div class="split-bar-wrapper">
+                    <div class="split-bar-header">
+                        <span>Total Cleaned Dataset: 4,217 Students &bull; 275,458 Eligible Interactions (100%)</span>
+                        <span>Student Disjointness: \(\mathcal{S}_{\text{train}} \cap \mathcal{S}_{\text{test}} = \emptyset\)</span>
+                    </div>
+                    <div class="split-bar">
+                        <div class="split-bar-train">
+                            <span>80% Training Pool</span>
+                            <span>3,373 Students (219,983 Interactions &bull; 79.86%)</span>
+                        </div>
+                        <div class="split-bar-test">
+                            <span>20% Held-Out</span>
+                            <span>844 Students (55,475 Rows &bull; 20.14%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side-by-Side Partition Details -->
+                <div class="split-details-grid">
+                    <div class="split-detail-box train-accent">
+                        <div class="split-detail-header">
+                            <h4 class="split-detail-title">80% Training Pool</h4>
+                            <span class="badge badge-neutral">Modeling & CV</span>
+                        </div>
+                        <ul class="split-detail-list">
+                            <li><span>Unique Students (\(|\mathcal{S}_{\text{train}}|\)):</span> <strong>3,373 (80.0%)</strong></li>
+                            <li><span>Total Interactions:</span> <strong>219,983 (79.86%)</strong></li>
+                            <li><span>Correct Outcomes (\(y=1\)):</span> <strong>144,886 (65.86%)</strong></li>
+                            <li><span>Non-Correct Outcomes (\(y=0\)):</span> <strong>75,097 (34.14%)</strong></li>
+                            <li><span>Internal Partitioning:</span> <strong>5-Fold Cross-Validation</strong></li>
+                            <li><span>Final Use:</span> <strong>Refit final XGBoost model</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="split-detail-box test-accent">
+                        <div class="split-detail-header">
+                            <h4 class="split-detail-title">20% Held-Out Test Set</h4>
+                            <span class="badge" style="background-color: rgba(245, 158, 11, 0.15); color: var(--brand-amber); border: 1px solid rgba(245, 158, 11, 0.3);">Strictly Quarantined</span>
+                        </div>
+                        <ul class="split-detail-list">
+                            <li><span>Unique Students (\(|\mathcal{S}_{\text{test}}|\)):</span> <strong>844 (20.0%)</strong></li>
+                            <li><span>Total Interactions:</span> <strong>55,475 (20.14%)</strong></li>
+                            <li><span>Correct Outcomes (\(y=1\)):</span> <strong>36,159 (65.18%)</strong></li>
+                            <li><span>Non-Correct Outcomes (\(y=0\)):</span> <strong>19,316 (34.82%)</strong></li>
+                            <li><span>Role:</span> <strong>Single final test evaluation</strong></li>
+                            <li><span>Contamination Status:</span> <strong>Zero exposure during modeling</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Identity Leakage Deep Dive Comparison Grid -->
+            <div class="leakage-comp-grid">
+                <div class="leakage-card flawed">
+                    <span class="leakage-badge danger">&times; Flawed Protocol: Interaction-Level Random Split</span>
+                    <h4 style="margin-bottom: 10px; color: var(--text-primary);">Why Naive Row Splitting Causes Identity Leakage</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">
+                        In standard random splitting, individual rows are shuffled indiscriminately. This scatters past and future interactions from the <em>same student</em> across both training and test sets.
+                    </p>
+                    <ul style="padding-left: 18px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.65;">
+                        <li><strong>Student Identity Recognition:</strong> Because students possess stable underlying ability, the model memorizes idiosyncratic student tendencies rather than learning generalizable pedagogical dynamics.</li>
+                        <li><strong>Contaminated Histories:</strong> Features derived from a student's prior questions in the test fold leak information directly into their training rows.</li>
+                        <li><strong>Artificially Inflated Metrics:</strong> Validation performance looks deceptively high but collapses catastrophically when deployed to unseen learners.</li>
+                    </ul>
+                </div>
+
+                <div class="leakage-card rigorous">
+                    <span class="leakage-badge success">&#10003; Rigorous Protocol: Student-Disjoint Split</span>
+                    <h4 style="margin-bottom: 10px; color: var(--text-primary);">Next Move AI: True Out-of-Sample Generalization</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">
+                        Next Move AI performs all data splits at the student level: \(\mathcal{S}_{\text{train}} \cap \mathcal{S}_{\text{test}} = \emptyset\). An entire learner's trajectory is assigned to either training or testing.
+                    </p>
+                    <ul style="padding-left: 18px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.65;">
+                        <li><strong>Complete Learner Independence:</strong> All 844 test students are totally novel to the model; it has never seen a single prior question from any of them.</li>
+                        <li><strong>Inductive Generalization:</strong> The model must infer student competence on the fly using Bayesian priors and observable chronological momentum.</li>
+                        <li><strong>Honest Deployment Readiness:</strong> Evaluates exactly how an intelligent tutoring system will perform when an enrolled student logs in for the first time.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Stage 2 Deep Dive: 5-Fold Cross-Validation Matrix Diagram Card -->
+            <div class="cv-matrix-card">
+                <div class="card-header" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <h3 class="card-title" style="margin-bottom: 0;">Stage 2: Five-Fold Cross-Validation Matrix</h3>
+                        <span class="badge badge-safe">Internal to 80% Training Pool (K=5)</span>
+                    </div>
+                    <p class="card-desc">
+                        The 3,373 training-pool students are divided into 5 student-disjoint folds via <code>KFold(n_splits=5, shuffle=True, random_state=42)</code>. In each round, 4 folds (80%) train the model and 1 fold (20%) validates it, guaranteeing \(\mathcal{S}_{\text{cv-train}}^{(k)} \cap \mathcal{S}_{\text{cv-val}}^{(k)} = \emptyset\).
+                    </p>
+                </div>
+
+                <!-- 5-Fold Cross-Validation Matrix Visual -->
+                <div class="cv-matrix-table">
+                    <!-- Iteration 1 -->
+                    <div class="cv-iteration-row">
+                        <div class="cv-iteration-label">
+                            <span>Iteration 1</span>
+                        </div>
+                        <div class="cv-folds-track">
+                            <div class="cv-fold-cell is-val">
+                                <span>Fold 1</span>
+                                <span class="cv-fold-tag">Validation (675)</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 2</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 3</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 4</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 5</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                        </div>
+                        <div class="cv-eval-col">
+                            <span class="cv-eval-badge">&rarr; Val Fold 1</span>
+                            <span>42,659 interactions</span>
+                        </div>
+                    </div>
+
+                    <!-- Iteration 2 -->
+                    <div class="cv-iteration-row">
+                        <div class="cv-iteration-label">
+                            <span>Iteration 2</span>
+                        </div>
+                        <div class="cv-folds-track">
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 1</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-val">
+                                <span>Fold 2</span>
+                                <span class="cv-fold-tag">Validation (675)</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 3</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 4</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 5</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                        </div>
+                        <div class="cv-eval-col">
+                            <span class="cv-eval-badge">&rarr; Val Fold 2</span>
+                            <span>43,710 interactions</span>
+                        </div>
+                    </div>
+
+                    <!-- Iteration 3 -->
+                    <div class="cv-iteration-row">
+                        <div class="cv-iteration-label">
+                            <span>Iteration 3</span>
+                        </div>
+                        <div class="cv-folds-track">
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 1</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 2</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-val">
+                                <span>Fold 3</span>
+                                <span class="cv-fold-tag">Validation (675)</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 4</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 5</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                        </div>
+                        <div class="cv-eval-col">
+                            <span class="cv-eval-badge">&rarr; Val Fold 3</span>
+                            <span>49,797 interactions</span>
+                        </div>
+                    </div>
+
+                    <!-- Iteration 4 -->
+                    <div class="cv-iteration-row">
+                        <div class="cv-iteration-label">
+                            <span>Iteration 4</span>
+                        </div>
+                        <div class="cv-folds-track">
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 1</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 2</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 3</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-val">
+                                <span>Fold 4</span>
+                                <span class="cv-fold-tag">Validation (674)</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 5</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                        </div>
+                        <div class="cv-eval-col">
+                            <span class="cv-eval-badge">&rarr; Val Fold 4</span>
+                            <span>41,672 interactions</span>
+                        </div>
+                    </div>
+
+                    <!-- Iteration 5 -->
+                    <div class="cv-iteration-row">
+                        <div class="cv-iteration-label">
+                            <span>Iteration 5</span>
+                        </div>
+                        <div class="cv-folds-track">
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 1</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 2</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 3</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-train">
+                                <span>Fold 4</span>
+                                <span class="cv-fold-tag">Train</span>
+                            </div>
+                            <div class="cv-fold-cell is-val">
+                                <span>Fold 5</span>
+                                <span class="cv-fold-tag">Validation (674)</span>
+                            </div>
+                        </div>
+                        <div class="cv-eval-col">
+                            <span class="cv-eval-badge">&rarr; Val Fold 5</span>
+                            <span>42,145 interactions</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pooled Out-of-Fold Aggregation Banner -->
+                <div class="cv-oof-banner">
+                    <div class="cv-oof-desc">
+                        <span class="cv-oof-icon">&#9879;</span>
+                        <div>
+                            <div class="cv-oof-title">Pooled Out-of-Fold (OOF) Prediction Assembly</div>
+                            <div class="cv-oof-subtitle">Every training-pool student appears in exactly one validation fold. Their union covers 100% of the training pool with zero leakage.</div>
+                        </div>
+                    </div>
+                    <div class="cv-oof-metric">
+                        <div>Total OOF Predictions</div>
+                        <strong>219,983 Interactions (3,373 Students)</strong>
+                    </div>
+                </div>
+
+                <!-- Fold Breakdown Table -->
+                <div class="table-responsive" style="margin-top: 24px; margin-bottom: 0;">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>Fold Round</th>
+                                <th>Training Students</th>
+                                <th>Training Interactions</th>
+                                <th>Validation Students</th>
+                                <th>Validation Interactions</th>
+                                <th>Validation Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Fold 1</strong></td>
+                                <td>2,698 (80.0%)</td>
+                                <td>177,324 (80.61%)</td>
+                                <td>675 (20.0%)</td>
+                                <td>42,659</td>
+                                <td>19.39%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fold 2</strong></td>
+                                <td>2,698 (80.0%)</td>
+                                <td>176,273 (80.13%)</td>
+                                <td>675 (20.0%)</td>
+                                <td>43,710</td>
+                                <td>19.87%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fold 3</strong></td>
+                                <td>2,698 (80.0%)</td>
+                                <td>170,186 (77.36%)</td>
+                                <td>675 (20.0%)</td>
+                                <td>49,797</td>
+                                <td>22.64%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fold 4</strong></td>
+                                <td>2,699 (80.0%)</td>
+                                <td>178,311 (81.06%)</td>
+                                <td>674 (20.0%)</td>
+                                <td>41,672</td>
+                                <td>18.94%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fold 5</strong></td>
+                                <td>2,699 (80.0%)</td>
+                                <td>177,838 (80.84%)</td>
+                                <td>674 (20.0%)</td>
+                                <td>42,145</td>
+                                <td>19.16%</td>
+                            </tr>
+                            <tr style="font-weight: 700; background-color: var(--bg-subtle);">
+                                <td>Pooled Out-of-Fold (OOF)</td>
+                                <td>&mdash;</td>
+                                <td>&mdash;</td>
+                                <td>3,373 (100.0%)</td>
+                                <td>219,983</td>
+                                <td>100.00%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stage 3 & Validation vs Test Performance Comparison -->
+            <div class="val-workflow-grid">
+                <!-- Stage 3 Workflow -->
+                <div class="card">
+                    <h3 style="margin-bottom: 14px;">Stage 3: Final Model Training & Test Workflow</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 14px; font-size: 0.92rem; line-height: 1.6;">
+                        A strict boundary governs how cross-validation and test partitions were utilized:
+                    </p>
+                    <ul style="padding-left: 20px; color: var(--text-secondary); line-height: 1.7; font-size: 0.88rem;">
+                        <li><strong>Model Selection via CV:</strong> 5-fold cross-validation compared Logistic Regression, Random Forest, LightGBM, and XGBoost. XGBoost achieved top ranking discrimination (0.7477 ROC-AUC) and calibration (0.5475 Log Loss).</li>
+                        <li><strong>Threshold Calibration via CV:</strong> The operating decision threshold \(\tau = 0.2880\) was tuned strictly on 219,983 out-of-fold validation predictions to target 75% recall of non-correct responses.</li>
+                        <li><strong>Full Training-Pool Refitting:</strong> Once all modeling decisions were locked, the final XGBoost pipeline was refit on all 3,373 training-pool students (219,983 interactions).</li>
+                        <li><strong>Quarantined Test Evaluation:</strong> The held-out test set (844 students, 55,475 interactions) was evaluated exactly once. It was never used for feature selection, hyperparameter tuning, or threshold setting.</li>
+                    </ul>
+                </div>
+
+                <!-- CV vs Held-Out Test Metric Parity -->
+                <div class="card">
+                    <h3 style="margin-bottom: 14px;">Validation vs. Final Test Performance</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 14px; font-size: 0.92rem; line-height: 1.6;">
+                        Remarkable numerical alignment between pooled out-of-fold cross-validation and held-out test confirms zero data leakage and genuine generalizability:
+                    </p>
+                    <div class="table-responsive" style="margin-bottom: 14px;">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Evaluation Metric</th>
+                                    <th>Pooled Out-of-Fold (OOF) CV</th>
+                                    <th>Held-Out Test Set</th>
+                                    <th>Delta (\(\Delta\))</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Log Loss</strong> \(\downarrow\)</td>
+                                    <td>0.54747</td>
+                                    <td>0.54972</td>
+                                    <td>+0.00225</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Brier Score</strong> \(\downarrow\)</td>
+                                    <td>0.18401</td>
+                                    <td>0.18491</td>
+                                    <td>+0.00090</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ROC-AUC</strong> \(\uparrow\)</td>
+                                    <td>0.74773</td>
+                                    <td>0.74678</td>
+                                    <td>-0.00095</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PR-AUC (Risk)</strong> \(\uparrow\)</td>
+                                    <td>0.62770</td>
+                                    <td>0.62409</td>
+                                    <td>-0.00361</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Risk Recall @ \(\tau=0.2880\)</strong></td>
+                                    <td>75.00%</td>
+                                    <td>74.72%</td>
+                                    <td>-0.28%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Risk Precision @ \(\tau=0.2880\)</strong></td>
+                                    <td>49.17%</td>
+                                    <td>49.46%</td>
+                                    <td>+0.29%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+                        <div style="margin-bottom: 6px; font-weight: 700; color: var(--text-primary);">Scientific Interpretations:</div>
+                        <ul style="padding-left: 18px; margin-bottom: 10px; font-size: 0.83rem;">
+                            <li><strong>Log Loss:</strong> Probabilistic prediction performance remains similar on previously unseen students, with only a small increase in Log Loss.</li>
+                            <li><strong>Brier Score:</strong> Mean squared error of predicted probabilities remains similar between cross-validation and the held-out test set.</li>
+                            <li><strong>Risk Recall:</strong> At the selected threshold, approximately 75% of incorrect responses in the pooled OOF predictions are identified as high-risk.</li>
+                        </ul>
+                        <p style="font-size: 0.80rem; color: var(--text-muted); margin-bottom: 0; line-height: 1.55;">
+                            <em>Aggregation & Dispersion Note:</em> The <strong>75.00%</strong> CV recall represents pooled out-of-fold performance (\(56,322 / 75,097\) failure interactions evaluated globally across the 219,983 training pool), whereas the unweighted mean of fold-specific recalls across the five validation rounds is <strong>74.92%</strong> with a sample standard deviation of <strong>1.26 percentage points</strong> across folds (\(\sigma = 0.0126\)). Both aggregation methods confirm stable risk detection.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preserved 5 Temporal Anti-Leakage Safeguards -->
+            <div class="card">
+                <div class="card-header" style="margin-bottom: 16px;">
+                    <h3 class="card-title">5 Temporal Anti-Leakage Safeguards</h3>
+                    <p class="card-desc">Within each partition, five strict algorithmic safeguards prevent lookahead bias and target self-contamination.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--brand-blue);">
+                        <strong style="color: var(--text-primary); font-size: 0.92rem;">1. Chronological Sorting</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.55;">
+                            All records sorted globally by <code>user_id</code> and ascending <code>order_id</code> to guarantee temporal validity.
+                        </p>
+                    </div>
+                    <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--brand-blue);">
+                        <strong style="color: var(--text-primary); font-size: 0.92rem;">2. Strict Past-Only Windows</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.55;">
+                            Only interactions satisfying \(\text{order\_id} < \text{order\_id}_{s,t}\) are permitted to enter feature accumulators.
+                        </p>
+                    </div>
+                    <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--brand-blue);">
+                        <strong style="color: var(--text-primary); font-size: 0.92rem;">3. 1-Step Cumulative Lag</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.55;">
+                            Correct counters implement <code>cumsum().shift(1, fill_value=0)</code> so the target interaction never enters its own history.
+                        </p>
+                    </div>
+                    <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--brand-blue);">
+                        <strong style="color: var(--text-primary); font-size: 0.92rem;">4. Attempt Count Exclusion</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.55;">
+                            <code>attempt_count</code> reflects post-submission behavior and is strictly excluded to prevent outcome leakage.
+                        </p>
+                    </div>
+                    <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--brand-blue);">
+                        <strong style="color: var(--text-primary); font-size: 0.92rem;">5. Question Difficulty Isolation</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.55;">
+                            The target student's own attempts on a problem are subtracted from question difficulty counters to eliminate self-leakage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Feature Engineering -->
+    <section id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Information Architecture</span>
+                <h2 class="section-title">Feature Engineering & Bayesian Smoothing</h2>
+                <p class="section-subtitle">Four distinct information groups engineered with Bayesian m-estimate shrinkage.</p>
+            </div>
+
+            <!-- The 4 Feature Groups -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 32px;">
+                <div class="card">
+                    <span class="badge badge-neutral" style="margin-bottom: 10px;">Group 1</span>
+                    <h4 style="margin-bottom: 8px;">Overall Student History</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Global track record across all previous eligible main questions regardless of subject. Selected: <code>overall_smoothed_accuracy</code>.
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-neutral" style="margin-bottom: 10px;">Group 2</span>
+                    <h4 style="margin-bottom: 8px;">Same-Skill History</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Historical track record sharing target skill(s). Selected: <code>weighted_same_skill_smoothed_accuracy</code> and log experience.
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-neutral" style="margin-bottom: 10px;">Group 3</span>
+                    <h4 style="margin-bottom: 8px;">Other-Skill History</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Performance on questions in non-overlapping skills, capturing cross-domain baseline ability. Selected: <code>weighted_other_skill_smoothed_accuracy</code>.
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-neutral" style="margin-bottom: 10px;">Group 4</span>
+                    <h4 style="margin-bottom: 8px;">Question Difficulty & Format</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Empirical success rates across other students plus categorical question type. Selected: smoothed difficulty, log volume, and format.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Live Smoothing Calculator Component -->
+            <div class="card-header">
+                <h3 class="card-title">Live Bayesian Smoothing Calculator</h3>
+                <p class="card-desc">Interactive demonstration of m-estimate shrinkage: \(A = \frac{C + \alpha P}{N + \alpha}\) with fixed \(\alpha = 10\).</p>
+            </div>
+
+            <div class="calc-container">
+                <div class="calc-inputs">
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary calc-preset-btn" data-c="0" data-n="0" data-p="0.6586" data-alpha="10">Cold Start (N=0)</button>
+                        <button type="button" class="btn btn-secondary calc-preset-btn" data-c="2" data-n="3" data-p="0.6586" data-alpha="10">Early Practice (N=3)</button>
+                        <button type="button" class="btn btn-secondary calc-preset-btn" data-c="42" data-n="50" data-p="0.6586" data-alpha="10">High Volume (N=50)</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="calc-c">Prior Correct Answers (C)</label>
+                            <input type="number" id="calc-c" class="form-control" value="2" min="0" max="500">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="calc-n">Prior Total Attempts (N)</label>
+                            <input type="number" id="calc-n" class="form-control" value="3" min="0" max="500">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="calc-p">Historical Prior (P)</label>
+                            <input type="number" id="calc-p" class="form-control" value="0.6586" step="0.0001" min="0" max="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="calc-alpha">Smoothing Strength (α)</label>
+                            <input type="number" id="calc-alpha" class="form-control" value="10" min="1" max="50">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calc-results-panel">
+                    <div>
+                        <span class="stat-label">Smoothed Estimated Accuracy</span>
+                        <div class="calc-stat-big" id="calc-result-smoothed">66.05%</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 10px;">
+                            <span>Raw Proportion (C/N): <strong id="calc-result-raw">66.67%</strong></span>
+                            <span id="calc-result-shrinkage">-0.62% vs raw</span>
+                        </div>
+                    </div>
+                    <div id="calc-explanation" style="font-size: 0.86rem; color: var(--text-secondary); padding-top: 14px; border-top: 1px solid var(--border-color);">
+                        Explanation loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Baseline Model (V0) -->
+    <section id="baseline">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Benchmark Comparison</span>
+                <h2 class="section-title">Baseline Model (V0)</h2>
+                <p class="section-subtitle">Evaluating performance without student-specific historical feature engineering.</p>
+            </div>
+
+            <div class="val-workflow-grid" style="margin-bottom: 0;">
+                <div class="card">
+                    <h3 style="margin-bottom: 12px;">Global Prior Benchmark Mechanism</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
+                        In each cross-validation fold, the baseline computes the training-fold empirical correct response rate (\(\bar{p}_{\text{train}} \approx 0.6586\), where \(\pm 0.0031\) represents the standard deviation of baseline priors across the five training folds, and \(0.658624\) represents the full 80% training-pool prior) and predicts that constant probability for every single validation interaction.
+                    </p>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">
+                        Because predictions are identical constants across all items, discrimination metrics like ROC-AUC were not calculated in the baseline notebook. Evaluation focuses on proper scoring rules (Log Loss and Brier Score).
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 16px;">5-Fold Cross-Validation Performance</h4>
+                    <div class="table-responsive" style="margin-bottom: 0;">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>CV Mean</th>
+                                    <th>CV Std</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Log Loss</strong></td>
+                                    <td><strong>0.6418</strong></td>
+                                    <td>± 0.0074</td>
+                                    <td>Unconditioned uncertainty floor</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Brier Score</strong></td>
+                                    <td><strong>0.2248</strong></td>
+                                    <td>± 0.0036</td>
+                                    <td>Calibration benchmark</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Training-Fold Prior (\(\bar{p}_{\text{train}}\))</strong></td>
+                                    <td>0.6586</td>
+                                    <td>± 0.0031</td>
+                                    <td>Fold prior standard deviation (pool prior: 0.658624)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Individual Feature Group Experiments -->
+    <section id="experiments">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Ablation & Selection</span>
+                <h2 class="section-title">Individual Feature Group Experiments</h2>
+                <p class="section-subtitle">Comparing isolated feature groups on 5-fold cross-validation with regularized Logistic Regression.</p>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <h4 class="card-title">Performance by Feature Information Group</h4>
+                    <p class="card-desc">Same-skill history (G2) provides the highest single-group discrimination, followed by overall student history (G1).</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart-single-groups"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: Combined Model and Ablation Study -->
+    <section id="ablation">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Information Synergy</span>
+                <h2 class="section-title">Combined Model & Feature Group Ablation Study</h2>
+                <p class="section-subtitle">Systematically dropping each information group from the combined Logistic Regression model across all 5 folds.</p>
+            </div>
+
+            <div class="ablation-grid">
+                <div class="table-responsive">
+                    <table class="table-modern ablation-table">
+                        <thead>
+                            <tr>
+                                <th>Configuration</th>
+                                <th>Log Loss</th>
+                                <th>Brier</th>
+                                <th>ROC-AUC</th>
+                                <th>Δ ROC-AUC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="active-row" data-name="Full Combined Model" data-auc="0.739631" data-delta="0.0000" data-logloss="0.554854" data-role="Integrates all 4 information groups. Establishes peak linear discrimination and calibration.">
+                                <td><strong>Full Combined Model</strong></td>
+                                <td><strong>0.554854</strong></td>
+                                <td><strong>0.186792</strong></td>
+                                <td><strong>0.739631</strong></td>
+                                <td>—</td>
+                            </tr>
+                            <tr data-name="Without G3 (Drop Other-Skill)" data-auc="0.735589" data-delta="-0.004042" data-logloss="0.557428" data-role="Dropping cross-skill history causes only a modest 0.004 AUC drop, but still degrades log loss by 0.0026.">
+                                <td>Without G3 (Drop Other-Skill)</td>
+                                <td>0.557428</td>
+                                <td>0.187930</td>
+                                <td>0.735589</td>
+                                <td class="text-negative">-0.004042</td>
+                            </tr>
+                            <tr data-name="Without G1 (Drop Overall History)" data-auc="0.718962" data-delta="-0.020669" data-logloss="0.570399" data-role="Dropping overall student history removes essential baseline competence capacity, causing a large 0.021 AUC drop.">
+                                <td>Without G1 (Drop Overall History)</td>
+                                <td>0.570399</td>
+                                <td>0.193642</td>
+                                <td>0.718962</td>
+                                <td class="text-negative">-0.020669</td>
+                            </tr>
+                            <tr data-name="Without G4 (Drop Question Difficulty)" data-auc="0.718691" data-delta="-0.020940" data-logloss="0.568764" data-role="Dropping question-level difficulty causes a 0.021 AUC degradation, proving that student skill alone cannot ignore item hardness.">
+                                <td>Without G4 (Drop Question Difficulty)</td>
+                                <td>0.568764</td>
+                                <td>0.192377</td>
+                                <td>0.718691</td>
+                                <td class="text-negative">-0.020940</td>
+                            </tr>
+                            <tr data-name="Without G2 (Drop Same-Skill History)" data-auc="0.718557" data-delta="-0.021074" data-logloss="0.568676" data-role="Dropping same-skill history causes the steepest degradation (-0.0211 AUC), confirming domain-specific history is the primary predictive pillar.">
+                                <td>Without G2 (Drop Same-Skill History)</td>
+                                <td>0.568676</td>
+                                <td>0.192659</td>
+                                <td>0.718557</td>
+                                <td class="text-negative">-0.021074</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="ablation-summary-card" id="ablation-selected-summary">
+                    <h4>Full Combined Model</h4>
+                    <div class="ablation-stat-grid">
+                        <div><span class="muted">ROC-AUC:</span> <strong>0.739631</strong></div>
+                        <div><span class="muted">Δ AUC vs Full:</span> <strong class="text-positive">0.0000</strong></div>
+                        <div><span class="muted">Log Loss:</span> <strong>0.554854</strong></div>
+                    </div>
+                    <p class="ablation-role-desc">Integrates all 4 information groups. Establishes peak linear discrimination and probability calibration across validation folds.</p>
+                </div>
+            </div>
+
+            <div class="chart-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h4 class="card-title">Marginal Discrimination Loss by Group</h4>
+                    <p class="card-desc">Visualizing the relative drop in ROC-AUC when each feature group is ablated.</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart-ablation"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 9: Advanced Model Comparison -->
+    <section id="models">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Algorithm Selection</span>
+                <h2 class="section-title">Advanced Model Comparison (5-Fold OOF CV)</h2>
+                <p class="section-subtitle">Evaluating Logistic Regression, Random Forest, LightGBM, and XGBoost on identical 7-feature folds.</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Model Architecture</th>
+                            <th>Log Loss ↓</th>
+                            <th>Brier Score ↓</th>
+                            <th>ROC-AUC ↑</th>
+                            <th>PR-AUC (Risk) ↑</th>
+                            <th>Selection Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Logistic Regression</td>
+                            <td>0.55485</td>
+                            <td>0.18679</td>
+                            <td>0.73963</td>
+                            <td>0.61324</td>
+                            <td>Linear Baseline</td>
+                        </tr>
+                        <tr>
+                            <td>Random Forest</td>
+                            <td>0.54895</td>
+                            <td>0.18451</td>
+                            <td>0.74681</td>
+                            <td>0.62610</td>
+                            <td>Ensemble Comparison</td>
+                        </tr>
+                        <tr>
+                            <td>LightGBM</td>
+                            <td>0.54789</td>
+                            <td>0.18417</td>
+                            <td>0.74731</td>
+                            <td>0.62693</td>
+                            <td>Close Runner-up</td>
+                        </tr>
+                        <tr class="active-row">
+                            <td><strong>XGBoost</strong></td>
+                            <td><strong>0.54747</strong></td>
+                            <td><strong>0.18401</strong></td>
+                            <td><strong>0.74773</strong></td>
+                            <td><strong>0.62770</strong></td>
+                            <td><span class="badge badge-safe">Selected Final Model</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 24px;">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h4 class="card-title">Discrimination & Risk Retrieval</h4>
+                        <p class="card-desc">ROC-AUC and PR-AUC across the four evaluated model families.</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-model-comparison"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4 style="margin-bottom: 12px;">Model Selection Nuance</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 14px; font-size: 0.92rem; line-height: 1.6;">
+                        <strong>Modest Tree Gains:</strong> Gradient boosted decision trees provide a modest +0.0081 improvement in ROC-AUC and -0.0074 drop in Log Loss over Logistic Regression. This demonstrates that non-linear feature interactions between student history and question difficulty provide minor additional predictive utility over well-engineered, smoothed linear features.
+                    </p>
+                    <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6;">
+                        <strong>Close Tree Parity:</strong> Performance between XGBoost (0.7477) and LightGBM (0.7473) is separated by only 0.0004 AUC. XGBoost was selected for final test set deployment due to its slight numerical lead and consistent fold stability.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 10: Final Model Evaluation -->
+    <section id="evaluation">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Out-of-Sample Generalization</span>
+                <h2 class="section-title">Final Model Evaluation (Untouched Test Set)</h2>
+                <p class="section-subtitle">Evaluating the refitted XGBoost pipeline exactly once on 55,475 interactions from 844 unseen students.</p>
+            </div>
+
+            <!-- Test Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Test Log Loss</div>
+                    <div class="stat-value">0.5497</div>
+                    <div class="stat-subtext">vs 0.5475 OOF CV</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Test Brier Score</div>
+                    <div class="stat-value">0.1849</div>
+                    <div class="stat-subtext">vs 0.1840 OOF CV</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Test ROC-AUC</div>
+                    <div class="stat-value">0.7468</div>
+                    <div class="stat-subtext">vs 0.7477 OOF CV</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Test PR-AUC (Risk)</div>
+                    <div class="stat-value">0.6241</div>
+                    <div class="stat-subtext">vs 0.6277 OOF CV</div>
+                </div>
+            </div>
+
+            <!-- Curves Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h4 class="card-title">Test ROC Curve</h4>
+                        <p class="card-desc">Discrimination on unseen students (AUC = 0.7468).</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-roc-curve"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h4 class="card-title">Test Precision-Recall Curve</h4>
+                        <p class="card-desc">Failure risk retrieval trade-off (AP = 0.6241).</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-pr-curve"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h4 class="card-title">Test Calibration Curve</h4>
+                        <p class="card-desc">Reliability diagram across 10 probability bins.</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-calibration-curve"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 11: Interactive Risk Threshold Explorer -->
+    <section id="threshold-explorer">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Decision-Theoretic Tuning</span>
+                <h2 class="section-title">Interactive Risk Threshold Explorer</h2>
+                <p class="section-subtitle">Tuning operational classification trade-offs using 219,983 out-of-fold validation predictions.</p>
+            </div>
+
+            <div class="callout-disclaimer">
+                <strong>Methodology Distinction:</strong> The operating decision threshold \(\tau = 0.2880\) was selected using <em>out-of-fold validation predictions</em> to target ~75% recall. Final test set metrics remain held-out and untouched.
+            </div>
+
+            <!-- Slider Control Box -->
+            <div class="threshold-slider-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span class="stat-label">Decision Threshold (τ)</span>
+                        <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand-blue);">
+                            τ = <span id="current-tau-display">0.2880</span>
+                            <span id="operating-point-badge" class="badge badge-safe" style="font-size: 0.75rem; margin-left: 8px;">Selected Operating Point</span>
+                        </div>
+                    </div>
+                    <button type="button" id="threshold-reset-btn" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.84rem;">Reset to τ = 0.2880</button>
+                </div>
+
+                <div class="slider-controls">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">0.05</span>
+                    <input type="range" id="threshold-slider" class="range-slider" min="0.05" max="0.85" step="0.01" value="0.2880">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">0.85</span>
+                    <input type="number" id="threshold-number" class="number-input-compact" min="0.05" max="0.85" step="0.005" value="0.2880">
+                </div>
+
+                <div id="threshold-tradeoff-note" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+                    Loading threshold trade-off analysis...
+                </div>
+            </div>
+
+            <!-- Dynamic Metrics & Confusion Matrix -->
+            <div class="val-workflow-grid" style="margin-bottom: 0;">
+                <!-- Performance Metrics -->
+                <div class="card">
+                    <h4 style="margin-bottom: 18px;">Validation Classification Metrics</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <span class="stat-label">Recall (Sensitivity)</span>
+                            <div class="stat-value" id="metric-recall" style="font-size: 1.7rem; color: var(--brand-emerald);">75.00%</div>
+                            <div class="stat-subtext">Share of failures flagged</div>
+                        </div>
+                        <div>
+                            <span class="stat-label">Precision (PPV)</span>
+                            <div class="stat-value" id="metric-precision" style="font-size: 1.7rem; color: var(--brand-amber);">49.17%</div>
+                            <div class="stat-subtext">Flagged that actually failed</div>
+                        </div>
+                        <div>
+                            <span class="stat-label">Specificity (TNR)</span>
+                            <div class="stat-value" id="metric-specificity" style="font-size: 1.7rem;">59.82%</div>
+                            <div class="stat-subtext">Correct attempts cleared</div>
+                        </div>
+                        <div>
+                            <span class="stat-label">F1-Score</span>
+                            <div class="stat-value" id="metric-f1" style="font-size: 1.7rem;">59.40%</div>
+                            <div class="stat-subtext">Harmonic mean P & R</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                        <span class="stat-label">Interactions Flagged for Support</span>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);" id="metric-flagged">
+                            114,542 / 219,983 (52.07%)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confusion Matrix Grid -->
+                <div class="cm-container">
+                    <h4>Out-of-Fold Confusion Matrix (N = 219,983)</h4>
+                    <div class="cm-grid">
+                        <div></div>
+                        <div class="cm-header">Flagged (Risk ≥ τ)</div>
+                        <div class="cm-header">Cleared (Risk &lt; τ)</div>
+
+                        <div class="cm-header" style="text-align: right; align-self: center;">Actually Failed (y=0)</div>
+                        <div class="cm-cell cm-tp">
+                            <span class="cm-cell-title">True Positive</span>
+                            <span class="cm-cell-num" id="cm-tp">56,322</span>
+                            <span class="cm-cell-sub" id="cm-tp-pct">(75.0% of failures)</span>
+                        </div>
+                        <div class="cm-cell cm-fn">
+                            <span class="cm-cell-title">False Negative</span>
+                            <span class="cm-cell-num" id="cm-fn">18,775</span>
+                            <span class="cm-cell-sub" id="cm-fn-pct">(25.0% missed)</span>
+                        </div>
+
+                        <div class="cm-header" style="text-align: right; align-self: center;">Actually Correct (y=1)</div>
+                        <div class="cm-cell cm-fp">
+                            <span class="cm-cell-title">False Positive</span>
+                            <span class="cm-cell-num" id="cm-fp">58,220</span>
+                            <span class="cm-cell-sub" id="cm-fp-pct">(40.2% false alarms)</span>
+                        </div>
+                        <div class="cm-cell cm-tn">
+                            <span class="cm-cell-title">True Negative</span>
+                            <span class="cm-cell-num" id="cm-tn">86,666</span>
+                            <span class="cm-cell-sub" id="cm-tn-pct">(59.8% cleared)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 12: Feature Importance -->
+    <section id="importance">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Interpretability</span>
+                <h2 class="section-title">Feature Importance Analysis</h2>
+                <p class="section-subtitle">Evaluating the relative gain contribution of all 11 transformed features within the fitted XGBoost pipeline.</p>
+            </div>
+
+            <div class="callout-disclaimer">
+                <strong>Non-Causal Interpretability Disclaimer:</strong> Relative gain scores measure split-improvement contributions within gradient-boosted decision trees. They describe predictive association in observational student logs and must not be interpreted as direct causal drivers of student learning.
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <h4 class="card-title">XGBoost Relative Gain Importance (%)</h4>
+                    <p class="card-desc">Domain-specific skill history dominates (32.17%), followed by overall student history (25.14%) and question difficulty (17.54%).</p>
+                </div>
+                <div class="chart-wrapper chart-wrapper-tall">
+                    <canvas id="chart-feature-importance"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 13: Student Outcome Simulator (Signature Interaction) -->
+    <section id="simulator">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-eyebrow">Interactive Deployment</span>
+                <h2 class="section-title">Student Outcome Simulator</h2>
+                <p class="section-subtitle">Run the actual trained XGBoost model directly in your browser using client-side tree traversal.</p>
+            </div>
+
+            <!-- Tab Navigation for Simulator vs Model Explorer -->
+            <div class="tabs-header" role="tablist">
+                <button type="button" class="tab-btn active" data-tab="tab-simulator" role="tab" aria-selected="true">Student History Simulator</button>
+                <button type="button" class="tab-btn" data-tab="tab-explorer" role="tab" aria-selected="false">Advanced Model Explorer (Raw Features)</button>
+            </div>
+
+            <!-- Panel 1: Student History Simulator -->
+            <div id="tab-simulator" class="tab-panel active">
+
+                <!-- Curated Scenarios Showcase -->
+                <h4 style="margin-bottom: 12px;">Curated Student Archetypes (Click to pre-fill)</h4>
+                <div class="scenarios-grid" id="curated-scenarios-container">
+                    <!-- Populated by simulator.js -->
+                </div>
+
+                <div id="sim-validation-warning" class="callout-warning" style="display: none;"></div>
+
+                <div class="sim-grid">
+                    <!-- Left: Intuitive Controls -->
+                    <div class="sim-panel">
+                        <h3 style="margin-bottom: 18px;">Hypothetical Student Profile</h3>
+
+                        <!-- Overall History Sliders -->
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label" for="sim-total-n">Total Prior Questions (N)</label>
+                                <input type="number" id="sim-total-n" class="number-input-compact" min="0" max="250" value="30">
+                            </div>
+                            <input type="range" id="sim-total-n-range" class="range-slider" min="0" max="250" value="30">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label" for="sim-total-c">Total Prior Correct Answers (C)</label>
+                                <input type="number" id="sim-total-c" class="number-input-compact" min="0" max="250" value="21">
+                            </div>
+                            <input type="range" id="sim-total-c-range" class="range-slider" min="0" max="250" value="21">
+                        </div>
+
+                        <!-- Same-Skill History Sliders -->
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label" for="sim-skill-n">Target Skill Prior Questions (N_skill)</label>
+                                <input type="number" id="sim-skill-n" class="number-input-compact" min="0" max="100" value="8">
+                            </div>
+                            <input type="range" id="sim-skill-n-range" class="range-slider" min="0" max="100" value="8">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label" for="sim-skill-c">Target Skill Prior Correct (C_skill)</label>
+                                <input type="number" id="sim-skill-c" class="number-input-compact" min="0" max="100" value="5">
+                            </div>
+                            <input type="range" id="sim-skill-c-range" class="range-slider" min="0" max="100" value="5">
+                        </div>
+
+                        <!-- Target Question Difficulty Mode -->
+                        <h4 style="margin-bottom: 12px; padding-top: 16px; border-top: 1px solid var(--border-color);">Upcoming Question Context</h4>
+
+                        <div style="display: flex; gap: 20px; margin-bottom: 16px;">
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.92rem;">
+                                <input type="radio" name="sim-q-mode" value="catalog" checked> Verified Problem Catalog
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.92rem;">
+                                <input type="radio" name="sim-q-mode" value="hypothetical"> Custom Hypothetical
+                            </label>
+                        </div>
+
+                        <!-- Catalog Dropdown -->
+                        <div id="sim-q-catalog-group" class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label" for="sim-question-select">Select Real ASSISTments Problem</label>
+                            <select id="sim-question-select" class="form-control">
+                                <!-- Populated by simulator.js -->
+                            </select>
+                            <div id="sim-selected-q-details" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                                <!-- Details pills -->
+                            </div>
+                        </div>
+
+                        <!-- Hypothetical Sliders -->
+                        <div id="sim-q-hypothetical-group" style="display: none; margin-bottom: 16px;">
+                            <div class="callout-warning" style="margin-bottom: 14px; font-size: 0.82rem;">
+                                <strong>Notice:</strong> In hypothetical mode, question difficulty and skill priors are user-specified simulation assumptions. Fixed training-pool priors are loaded from <code>training_priors.json</code>.
+                            </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label class="form-label" for="hyp-skill-preset-select">Target Skill Archetype (G2 Prior)</label>
+                                <select id="hyp-skill-preset-select" class="form-control">
+                                    <option value="skill_27">Skill #27: Finding Percent of a Number (63.0% training prior, Average)</option>
+                                    <option value="skill_76">Skill #76: Ordering Real Numbers (38.3% training prior, Challenging)</option>
+                                    <option value="skill_18">Skill #18: Area of a Circle (75.9% training prior, High Mastery)</option>
+                                    <option value="skill_16_17">Multi-Skill: Equation Solving #16_17 (52.6% combined prior)</option>
+                                    <option value="unseen">Unseen / Unannotated Skill (50.0% Cold-Start Fallback)</option>
+                                    <option value="custom">Custom Prior (Adjust via slider below)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <label class="form-label" for="hyp-skill-prior-slider">Skill Empirical Prior (P_G2)</label>
+                                    <span id="hyp-skill-prior-val" class="badge badge-neutral">63.0% (Skill #27)</span>
+                                </div>
+                                <input type="range" id="hyp-skill-prior-slider" class="range-slider" min="30" max="85" step="1" value="63">
+                                <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;">
+                                    Training pool range across 123 skills: 38.3% to 75.9%. Unseen/missing skill fallback = 50.0%.
+                                </span>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <label class="form-label" for="hyp-acc-slider">Hypothetical Question Success Rate (G4 Difficulty)</label>
+                                    <span id="hyp-acc-val" class="badge badge-neutral">65%</span>
+                                </div>
+                                <input type="range" id="hyp-acc-slider" class="range-slider" min="15" max="95" step="1" value="65">
+                            </div>
+                            <div class="form-group">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <label class="form-label" for="hyp-exp-slider">Hypothetical Platform Exposure (Other-Student Attempts)</label>
+                                    <span id="hyp-exp-val" class="badge badge-neutral">15 attempts</span>
+                                </div>
+                                <input type="range" id="hyp-exp-slider" class="range-slider" min="0" max="100" step="1" value="15">
+                                <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;">
+                                    Set to 0 attempts to simulate an Unseen Question cold-start (shrinks directly to G1 global prior 65.9%).
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Question Format -->
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="form-label" for="sim-format-select">Question Presentation Format</label>
+                            <select id="sim-format-select" class="form-control">
+                                <option value="algebra">Algebra (Standard equation / expression)</option>
+                                <option value="fill_in_1">Fill-in-1 (Direct numerical / text entry)</option>
+                                <option value="choose_1">Choose-1 (Single-choice multiple option)</option>
+                                <option value="choose_n">Choose-n (Multi-select options)</option>
+                                <option value="open_response">Open Response (Free-text submission)</option>
+                            </select>
+                        </div>
+
+                        <button type="button" id="sim-reset-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 12px;">Reset to Default Student</button>
+
+                        <div class="callout-disclaimer" style="font-size: 0.78rem; line-height: 1.45; margin-top: 10px;">
+                            <strong>Residual Derivation &amp; Invariants:</strong> The simulator derives other-skill counts via \(N_{\text{other}} = \max(0, N_{\text{total}} - N_{\text{same}})\) and \(C_{\text{other}} = \max(0, C_{\text{total}} - C_{\text{same}})\). This relationship is mathematically exact when every prior question has a single known skill. The interface enforces the invariants \(C_{\text{total}} \le N_{\text{total}}\), \(N_{\text{same}} \le N_{\text{total}}\), and \(C_{\text{same}} \le \min(N_{\text{same}}, C_{\text{total}})\).
+                        </div>
+                    </div>
+
+                    <!-- Right: Prediction Results & Feature Table -->
+                    <div class="sim-panel">
+                        <h3 style="margin-bottom: 18px;">Model Prediction & Risk Assessment</h3>
+
+                        <div class="sim-result-card">
+                            <span class="stat-label">Model Estimated Outcomes</span>
+                            <div style="display: flex; justify-content: space-around; align-items: center; margin: 16px 0;">
+                                <div>
+                                    <span class="muted" style="font-size: 0.85rem;">P(Correct)</span>
+                                    <div id="sim-p-correct" style="font-size: 2.2rem; font-weight: 800; color: var(--brand-emerald);">68.3%</div>
+                                </div>
+                                <div style="font-size: 1.5rem; color: var(--border-color);">|</div>
+                                <div>
+                                    <span class="muted" style="font-size: 0.85rem;">Failure Risk P(y=0)</span>
+                                    <div id="sim-p-risk" style="font-size: 2.2rem; font-weight: 800; color: var(--brand-amber);">31.7%</div>
+                                </div>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div id="sim-risk-bar-fill" class="progress-bar-fill bg-danger" style="width: 31.7%;"></div>
+                            </div>
+
+                            <div id="sim-decision-badge" class="result-badge badge-flagged">
+                                Evaluating...
+                            </div>
+                        </div>
+
+                        <h4 style="margin-bottom: 12px;">Calculated 7-Feature Vector Passed to XGBoost</h4>
+                        <div class="table-responsive" style="margin-bottom: 16px;">
+                            <table class="table-modern" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Model Feature</th>
+                                        <th>Group</th>
+                                        <th>Calculated Value</th>
+                                        <th>Origin Formula</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sim-feature-table-body">
+                                    <!-- Populated dynamically by simulator.js -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+                            <strong>Inference Engine:</strong> Executing 500 decision trees client-side via JavaScript Float32 single-precision matching Python XGBoost to &lt; 1e-6 error.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2: Advanced Model Explorer (Direct Raw Feature Input) -->
+            <div id="tab-explorer" class="tab-panel">
+                <div class="callout-disclaimer">
+                    <strong>Model Explorer Mode:</strong> This advanced interface allows direct manipulation of the seven original model features without student-history assumptions.
+                </div>
+
+                <div class="sim-grid">
+                    <div class="sim-panel">
+                        <h3 style="margin-bottom: 18px;">Direct 7-Feature Sliders</h3>
+
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label">1. overall_smoothed_accuracy</label>
+                                <span id="exp-f0-val" class="badge badge-neutral">0.674</span>
+                            </div>
+                            <input type="range" id="exp-f0" class="range-slider" min="0.0" max="1.0" step="0.01" value="0.674">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label">2. weighted_same_skill_smoothed_accuracy</label>
+                                <span id="exp-f1-val" class="badge badge-neutral">0.629</span>
+                            </div>
+                            <input type="range" id="exp-f1" class="range-slider" min="0.0" max="1.0" step="0.01" value="0.629">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label">3. log_weighted_same_skill_previous_interactions</label>
+                                <span id="exp-f2-val" class="badge badge-neutral">1.632</span>
+                            </div>
+                            <input type="range" id="exp-f2" class="range-slider" min="0.0" max="5.5" step="0.05" value="1.632">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label">4. weighted_other_skill_smoothed_accuracy</label>
+                                <span id="exp-f3-val" class="badge badge-neutral">0.674</span>
+                            </div>
+                            <input type="range" id="exp-f3" class="range-slider" min="0.0" max="1.0" step="0.01" value="0.674">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label">5. question_smoothed_accuracy</label>
+                                <span id="exp-f4-val" class="badge badge-neutral">0.663</span>
+                            </div>
+                            <input type="range" id="exp-f4" class="range-slider" min="0.1" max="0.95" step="0.01" value="0.663">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label class="form-label">6. log_question_previous_interactions</label>
+                                <span id="exp-f5-val" class="badge badge-neutral">2.186</span>
+                            </div>
+                            <input type="range" id="exp-f5" class="range-slider" min="0.0" max="5.0" step="0.05" value="2.186">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="form-label" for="exp-f6">7. answer_type</label>
+                            <select id="exp-f6" class="form-control">
+                                <option value="algebra">algebra</option>
+                                <option value="choose_1">choose_1</option>
+                                <option value="choose_n">choose_n</option>
+                                <option value="fill_in_1">fill_in_1</option>
+                                <option value="open_response">open_response</option>
+                            </select>
+                        </div>
+
+                        <button type="button" id="exp-reset-btn" class="btn btn-secondary" style="width: 100%;">Reset to Training Means</button>
+                    </div>
+
+                    <div class="sim-panel">
+                        <h3 style="margin-bottom: 18px;">Pipeline Internal Transformations</h3>
+
+                        <div class="sim-result-card">
+                            <span class="stat-label">Model Output</span>
+                            <div style="display: flex; justify-content: space-around; margin: 14px 0;">
+                                <div>
+                                    <span class="muted" style="font-size: 0.85rem;">P(Correct)</span>
+                                    <div id="exp-res-corr" style="font-size: 2rem; font-weight: 800; color: var(--brand-emerald);">65.86%</div>
+                                </div>
+                                <div>
+                                    <span class="muted" style="font-size: 0.85rem;">P(Risk)</span>
+                                    <div id="exp-res-risk" style="font-size: 2rem; font-weight: 800; color: var(--brand-amber);">34.14%</div>
+                                </div>
+                                <div>
+                                    <span class="muted" style="font-size: 0.85rem;">Logit Score</span>
+                                    <div id="exp-res-logit" style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-top: 6px;">+0.6572</div>
+                                </div>
+                            </div>
+                            <div id="exp-res-badge" class="badge badge-safe">CLEARED / LOW RISK</div>
+                        </div>
+
+                        <h4 style="margin-bottom: 10px;">1. StandardScaler Transformation (\(z = \frac{x - \mu}{\sigma}\))</h4>
+                        <div class="table-responsive" style="margin-bottom: 16px;">
+                            <table class="table-modern" style="font-size: 0.8rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Feature</th>
+                                        <th>Raw Value</th>
+                                        <th>Training Mean (μ)</th>
+                                        <th>Training Std (σ)</th>
+                                        <th>Standardized (z)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exp-zscore-table-body">
+                                    <!-- Populated by simulator.js -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 style="margin-bottom: 10px;">2. OneHotEncoder Expansion</h4>
+                        <div id="exp-onehot-display" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <!-- One hot pills -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h4>Next Move AI</h4>
+                    <p>
+                        Undergraduate Machine Learning Project (ES 335) predicting student interaction outcomes on the ASSISTments Skill Builder dataset using chronological Bayesian feature engineering and gradient-boosted decision trees.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h5>Academic References</h5>
+                    <ul>
+                        <li><a href="https://sites.google.com/site/assistmentsdata/home/2009-2010-assistment-data/skill-builder-data-2009-2010" target="_blank" rel="noopener">ASSISTments 2009–2010</a></li>
+                        <li><a href="https://doi.org/10.1007/s11257-009-9061-1" target="_blank" rel="noopener">Feng et al. (UMUAI 2009)</a></li>
+                        <li><a href="https://xgboost.readthedocs.io/" target="_blank" rel="noopener">Chen & Guestrin (KDD 2016)</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Project Repository</h5>
+                    <ul>
+                        <li><a href="https://github.com/rajuriprathik-a11y/next-move-ai" target="_blank" rel="noopener">GitHub: next-move-ai</a></li>
+                        <li><a href="#simulator">In-Browser Simulator</a></li>
+                        <li><a href="#threshold-explorer">Threshold Explorer</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>
+                    Next Move AI — ES 335 Machine Learning Academic Submission (IIT Gandhinagar).
+                </div>
+                <div>
+                    Offline Predictive ML Study • No real-time educational interventions were deployed.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application JavaScript Modules -->
+    <script src="js/math_renderer.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/model_inference.js"></script>
+    <script src="js/smoothing_calculator.js"></script>
+    <script src="js/threshold_explorer.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

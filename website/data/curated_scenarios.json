@@ -1,0 +1,137 @@
+[
+  {
+    "id": "novice_cold_start",
+    "title": "1. The Novice Student (Cold Start)",
+    "description": "A student encountering their first question on the intelligent tutoring platform. With zero previous interactions, all personal history features shrink gracefully to the training-pool global prior.",
+    "student_story": "Brand new student to the platform attempting an average difficulty algebra question for the first time.",
+    "inputs": {
+      "overall_smoothed_accuracy": 0.6586,
+      "weighted_same_skill_smoothed_accuracy": 0.6586,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.6586,
+      "question_smoothed_accuracy": 0.6626,
+      "log_question_previous_interactions": 2.7081,
+      "answer_type": "algebra"
+    },
+    "unlogged_counts": {
+      "total_questions": 0,
+      "total_correct": 0,
+      "same_skill_questions": 0,
+      "same_skill_correct": 0,
+      "question_attempts": 14
+    },
+    "prediction": {
+      "p_correct": 0.5272,
+      "p_risk": 0.4728,
+      "flagged": true
+    }
+  },
+  {
+    "id": "high_mastery",
+    "title": "2. Consistent High Performer",
+    "description": "A diligent student with substantial platform practice (60 prior questions, 88% overall success) facing a familiar skill where they have consistently performed well.",
+    "student_story": "Advanced student with strong track record encountering a standard equation solving problem.",
+    "inputs": {
+      "overall_smoothed_accuracy": 0.8512,
+      "weighted_same_skill_smoothed_accuracy": 0.8385,
+      "log_weighted_same_skill_previous_interactions": 2.7726,
+      "weighted_other_skill_smoothed_accuracy": 0.8553,
+      "question_smoothed_accuracy": 0.6815,
+      "log_question_previous_interactions": 2.8332,
+      "answer_type": "algebra"
+    },
+    "unlogged_counts": {
+      "total_questions": 60,
+      "total_correct": 53,
+      "same_skill_questions": 15,
+      "same_skill_correct": 13,
+      "question_attempts": 16
+    },
+    "prediction": {
+      "p_correct": 0.886,
+      "p_risk": 0.114,
+      "flagged": false
+    }
+  },
+  {
+    "id": "topic_struggler",
+    "title": "3. Strong Student, Weak Skill",
+    "description": "A student who excels across general mathematics (78% overall accuracy) but has repeatedly struggled on this specific target skill (only 1 out of 8 correct).",
+    "student_story": "Demonstrates that domain-specific skill history (the top-ranked feature) overrides broad overall competence when predicting struggle.",
+    "inputs": {
+      "overall_smoothed_accuracy": 0.7514,
+      "weighted_same_skill_smoothed_accuracy": 0.4215,
+      "log_weighted_same_skill_previous_interactions": 2.1972,
+      "weighted_other_skill_smoothed_accuracy": 0.7925,
+      "question_smoothed_accuracy": 0.5842,
+      "log_question_previous_interactions": 2.5649,
+      "answer_type": "fill_in_1"
+    },
+    "unlogged_counts": {
+      "total_questions": 45,
+      "total_correct": 35,
+      "same_skill_questions": 8,
+      "same_skill_correct": 1,
+      "question_attempts": 12
+    },
+    "prediction": {
+      "p_correct": 0.5857,
+      "p_risk": 0.4143,
+      "flagged": true
+    }
+  },
+  {
+    "id": "recovering_learner",
+    "title": "4. Learner Improving with Practice",
+    "description": "A student who struggled during early practice but has shown strong improvement over 30 questions, now demonstrating 75% accuracy on recent topic items.",
+    "student_story": "Illustrates the role of Bayesian shrinkage as observation count grows and the student overcomes an initial cold start.",
+    "inputs": {
+      "overall_smoothed_accuracy": 0.642,
+      "weighted_same_skill_smoothed_accuracy": 0.7135,
+      "log_weighted_same_skill_previous_interactions": 2.5649,
+      "weighted_other_skill_smoothed_accuracy": 0.612,
+      "question_smoothed_accuracy": 0.655,
+      "log_question_previous_interactions": 2.7081,
+      "answer_type": "algebra"
+    },
+    "unlogged_counts": {
+      "total_questions": 30,
+      "total_correct": 18,
+      "same_skill_questions": 12,
+      "same_skill_correct": 9,
+      "question_attempts": 14
+    },
+    "prediction": {
+      "p_correct": 0.7553,
+      "p_risk": 0.2447,
+      "flagged": false
+    }
+  },
+  {
+    "id": "threshold_boundary",
+    "title": "5. Near-Threshold Decision Boundary",
+    "description": "A borderline interaction situated precisely near the operational risk threshold (tau = 0.2880), illustrating how the classification decision handles uncertainty.",
+    "student_story": "A student with moderate history attempting an above-average difficulty question, balancing right on the edge of the intervention trigger.",
+    "inputs": {
+      "overall_smoothed_accuracy": 0.685,
+      "weighted_same_skill_smoothed_accuracy": 0.672,
+      "log_weighted_same_skill_previous_interactions": 1.6094,
+      "weighted_other_skill_smoothed_accuracy": 0.688,
+      "question_smoothed_accuracy": 0.552,
+      "log_question_previous_interactions": 2.4849,
+      "answer_type": "algebra"
+    },
+    "unlogged_counts": {
+      "total_questions": 25,
+      "total_correct": 17,
+      "same_skill_questions": 4,
+      "same_skill_correct": 3,
+      "question_attempts": 11
+    },
+    "prediction": {
+      "p_correct": 0.644,
+      "p_risk": 0.356,
+      "flagged": true
+    }
+  }
+]

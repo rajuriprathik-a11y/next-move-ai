@@ -1,0 +1,1150 @@
+{
+  "description": "Next Move AI \u2014 Training-Only Historical Statistics and Bayesian Smoothing Priors",
+  "partition": "80% student-level training pool (strictly no test data)",
+  "training_interactions": 219983,
+  "training_correct": 144886,
+  "annotated_interactions": 206534,
+  "annotated_correct": 135861,
+  "smoothing_alpha": 10.0,
+  "g1_overall_history": {
+    "final_global_prior": 0.658624,
+    "cold_start_fallback": 0.5
+  },
+  "g2_same_skill_history": {
+    "total_skills": 123,
+    "skill_priors_mean": 0.618368,
+    "unseen_skill_fallback": 0.5,
+    "missing_skill_fallback": 0.5,
+    "aggregation_rule": "multi-skill questions sum fractional_correct / sum fractional_weight across target skills",
+    "skills": {
+      "1": {
+        "skill_id": "1",
+        "fractional_weight": 1844.0,
+        "fractional_correct": 1371.0,
+        "empirical_prior": 0.743492,
+        "raw_count": 3307,
+        "raw_correct": 2494,
+        "other_skill_prior": 0.657042
+      },
+      "10": {
+        "skill_id": "10",
+        "fractional_weight": 2771.5,
+        "fractional_correct": 2044.0,
+        "empirical_prior": 0.737507,
+        "raw_count": 5543,
+        "raw_correct": 4088,
+        "other_skill_prior": 0.65673
+      },
+      "101": {
+        "skill_id": "101",
+        "fractional_weight": 1066.0,
+        "fractional_correct": 690.0,
+        "empirical_prior": 0.64728,
+        "raw_count": 1066,
+        "raw_correct": 690,
+        "other_skill_prior": 0.657869
+      },
+      "102": {
+        "skill_id": "102",
+        "fractional_weight": 0.5,
+        "fractional_correct": 0.0,
+        "empirical_prior": 0.0,
+        "raw_count": 1,
+        "raw_correct": 0,
+        "other_skill_prior": 0.657816
+      },
+      "104": {
+        "skill_id": "104",
+        "fractional_weight": 41.5,
+        "fractional_correct": 18.5,
+        "empirical_prior": 0.445783,
+        "raw_count": 76,
+        "raw_correct": 36,
+        "other_skill_prior": 0.657857
+      },
+      "105": {
+        "skill_id": "105",
+        "fractional_weight": 302.3333,
+        "fractional_correct": 243.0,
+        "empirical_prior": 0.803749,
+        "raw_count": 387,
+        "raw_correct": 281,
+        "other_skill_prior": 0.6576
+      },
+      "11": {
+        "skill_id": "11",
+        "fractional_weight": 3934.5,
+        "fractional_correct": 2809.0,
+        "empirical_prior": 0.713941,
+        "raw_count": 4735,
+        "raw_correct": 3361,
+        "other_skill_prior": 0.656724
+      },
+      "110": {
+        "skill_id": "110",
+        "fractional_weight": 376.0,
+        "fractional_correct": 319.0,
+        "empirical_prior": 0.848404,
+        "raw_count": 376,
+        "raw_correct": 319,
+        "other_skill_prior": 0.657467
+      },
+      "12": {
+        "skill_id": "12",
+        "fractional_weight": 1485.5,
+        "fractional_correct": 768.0,
+        "empirical_prior": 0.516998,
+        "raw_count": 2372,
+        "raw_correct": 1263,
+        "other_skill_prior": 0.658834
+      },
+      "13": {
+        "skill_id": "13",
+        "fractional_weight": 2973.5,
+        "fractional_correct": 1863.0,
+        "empirical_prior": 0.626534,
+        "raw_count": 4761,
+        "raw_correct": 3113,
+        "other_skill_prior": 0.658271
+      },
+      "14": {
+        "skill_id": "14",
+        "fractional_weight": 798.0,
+        "fractional_correct": 698.5,
+        "empirical_prior": 0.875313,
+        "raw_count": 1596,
+        "raw_correct": 1397,
+        "other_skill_prior": 0.656971
+      },
+      "15": {
+        "skill_id": "15",
+        "fractional_weight": 1969.0,
+        "fractional_correct": 1477.5,
+        "empirical_prior": 0.750381,
+        "raw_count": 3355,
+        "raw_correct": 2557,
+        "other_skill_prior": 0.656923
+      },
+      "16": {
+        "skill_id": "16",
+        "fractional_weight": 2315.0,
+        "fractional_correct": 1245.0,
+        "empirical_prior": 0.537797,
+        "raw_count": 4005,
+        "raw_correct": 1999,
+        "other_skill_prior": 0.659175
+      },
+      "163": {
+        "skill_id": "163",
+        "fractional_weight": 170.0,
+        "fractional_correct": 98.0,
+        "empirical_prior": 0.576471,
+        "raw_count": 170,
+        "raw_correct": 98,
+        "other_skill_prior": 0.657881
+      },
+      "165": {
+        "skill_id": "165",
+        "fractional_weight": 78.0,
+        "fractional_correct": 28.0,
+        "empirical_prior": 0.358974,
+        "raw_count": 78,
+        "raw_correct": 28,
+        "other_skill_prior": 0.657927
+      },
+      "166": {
+        "skill_id": "166",
+        "fractional_weight": 295.0,
+        "fractional_correct": 107.0,
+        "empirical_prior": 0.362712,
+        "raw_count": 295,
+        "raw_correct": 107,
+        "other_skill_prior": 0.658236
+      },
+      "17": {
+        "skill_id": "17",
+        "fractional_weight": 4467.0,
+        "fractional_correct": 2321.0,
+        "empirical_prior": 0.519588,
+        "raw_count": 6157,
+        "raw_correct": 3075,
+        "other_skill_prior": 0.66087
+      },
+      "173": {
+        "skill_id": "173",
+        "fractional_weight": 18.5,
+        "fractional_correct": 15.0,
+        "empirical_prior": 0.810811,
+        "raw_count": 74,
+        "raw_correct": 60,
+        "other_skill_prior": 0.657801
+      },
+      "18": {
+        "skill_id": "18",
+        "fractional_weight": 5361.5,
+        "fractional_correct": 4067.0,
+        "empirical_prior": 0.758556,
+        "raw_count": 5700,
+        "raw_correct": 4354,
+        "other_skill_prior": 0.655129
+      },
+      "190": {
+        "skill_id": "190",
+        "fractional_weight": 18.5,
+        "fractional_correct": 15.0,
+        "empirical_prior": 0.810811,
+        "raw_count": 74,
+        "raw_correct": 60,
+        "other_skill_prior": 0.657801
+      },
+      "193": {
+        "skill_id": "193",
+        "fractional_weight": 18.5,
+        "fractional_correct": 15.0,
+        "empirical_prior": 0.810811,
+        "raw_count": 74,
+        "raw_correct": 60,
+        "other_skill_prior": 0.657801
+      },
+      "2": {
+        "skill_id": "2",
+        "fractional_weight": 1787.75,
+        "fractional_correct": 962.0833,
+        "empirical_prior": 0.538153,
+        "raw_count": 4948,
+        "raw_correct": 2578,
+        "other_skill_prior": 0.658859
+      },
+      "203": {
+        "skill_id": "203",
+        "fractional_weight": 37.0,
+        "fractional_correct": 9.0,
+        "empirical_prior": 0.243243,
+        "raw_count": 37,
+        "raw_correct": 9,
+        "other_skill_prior": 0.657888
+      },
+      "204": {
+        "skill_id": "204",
+        "fractional_weight": 94.0,
+        "fractional_correct": 30.0,
+        "empirical_prior": 0.319149,
+        "raw_count": 94,
+        "raw_correct": 30,
+        "other_skill_prior": 0.657968
+      },
+      "21": {
+        "skill_id": "21",
+        "fractional_weight": 592.0,
+        "fractional_correct": 350.0,
+        "empirical_prior": 0.591216,
+        "raw_count": 828,
+        "raw_correct": 492,
+        "other_skill_prior": 0.658006
+      },
+      "217": {
+        "skill_id": "217",
+        "fractional_weight": 65.0,
+        "fractional_correct": 21.0,
+        "empirical_prior": 0.323077,
+        "raw_count": 65,
+        "raw_correct": 21,
+        "other_skill_prior": 0.65792
+      },
+      "22": {
+        "skill_id": "22",
+        "fractional_weight": 380.0,
+        "fractional_correct": 255.0,
+        "empirical_prior": 0.671053,
+        "raw_count": 616,
+        "raw_correct": 397,
+        "other_skill_prior": 0.65779
+      },
+      "221": {
+        "skill_id": "221",
+        "fractional_weight": 18.5,
+        "fractional_correct": 15.0,
+        "empirical_prior": 0.810811,
+        "raw_count": 74,
+        "raw_correct": 60,
+        "other_skill_prior": 0.657801
+      },
+      "24": {
+        "skill_id": "24",
+        "fractional_weight": 465.0,
+        "fractional_correct": 419.5,
+        "empirical_prior": 0.902151,
+        "raw_count": 472,
+        "raw_correct": 424,
+        "other_skill_prior": 0.657263
+      },
+      "25": {
+        "skill_id": "25",
+        "fractional_weight": 1220.0,
+        "fractional_correct": 839.0,
+        "empirical_prior": 0.687705,
+        "raw_count": 1220,
+        "raw_correct": 839,
+        "other_skill_prior": 0.657637
+      },
+      "26": {
+        "skill_id": "26",
+        "fractional_weight": 204.0,
+        "fractional_correct": 173.0,
+        "empirical_prior": 0.848039,
+        "raw_count": 204,
+        "raw_correct": 173,
+        "other_skill_prior": 0.657626
+      },
+      "27": {
+        "skill_id": "27",
+        "fractional_weight": 5463.5,
+        "fractional_correct": 3444.5,
+        "empirical_prior": 0.630457,
+        "raw_count": 5471,
+        "raw_correct": 3446,
+        "other_skill_prior": 0.658558
+      },
+      "276": {
+        "skill_id": "276",
+        "fractional_weight": 1609.0,
+        "fractional_correct": 1244.0,
+        "empirical_prior": 0.773151,
+        "raw_count": 1609,
+        "raw_correct": 1244,
+        "other_skill_prior": 0.656909
+      },
+      "277": {
+        "skill_id": "277",
+        "fractional_weight": 9284.0,
+        "fractional_correct": 5583.0,
+        "empirical_prior": 0.601357,
+        "raw_count": 9284,
+        "raw_correct": 5583,
+        "other_skill_prior": 0.660471
+      },
+      "278": {
+        "skill_id": "278",
+        "fractional_weight": 3684.0,
+        "fractional_correct": 2161.0,
+        "empirical_prior": 0.586591,
+        "raw_count": 3972,
+        "raw_correct": 2329,
+        "other_skill_prior": 0.659108
+      },
+      "279": {
+        "skill_id": "279",
+        "fractional_weight": 5319.0,
+        "fractional_correct": 4198.0,
+        "empirical_prior": 0.789246,
+        "raw_count": 5319,
+        "raw_correct": 4198,
+        "other_skill_prior": 0.65434
+      },
+      "280": {
+        "skill_id": "280",
+        "fractional_weight": 8927.0,
+        "fractional_correct": 6110.0,
+        "empirical_prior": 0.68444,
+        "raw_count": 8927,
+        "raw_correct": 6110,
+        "other_skill_prior": 0.656611
+      },
+      "290": {
+        "skill_id": "290",
+        "fractional_weight": 356.0,
+        "fractional_correct": 142.0,
+        "empirical_prior": 0.398876,
+        "raw_count": 356,
+        "raw_correct": 142,
+        "other_skill_prior": 0.658261
+      },
+      "292": {
+        "skill_id": "292",
+        "fractional_weight": 290.5,
+        "fractional_correct": 40.0,
+        "empirical_prior": 0.137694,
+        "raw_count": 296,
+        "raw_correct": 40,
+        "other_skill_prior": 0.658547
+      },
+      "293": {
+        "skill_id": "293",
+        "fractional_weight": 329.5,
+        "fractional_correct": 171.0,
+        "empirical_prior": 0.518968,
+        "raw_count": 335,
+        "raw_correct": 171,
+        "other_skill_prior": 0.658036
+      },
+      "294": {
+        "skill_id": "294",
+        "fractional_weight": 642.0,
+        "fractional_correct": 347.0,
+        "empirical_prior": 0.540498,
+        "raw_count": 642,
+        "raw_correct": 347,
+        "other_skill_prior": 0.65818
+      },
+      "295": {
+        "skill_id": "295",
+        "fractional_weight": 97.0,
+        "fractional_correct": 92.0,
+        "empirical_prior": 0.948454,
+        "raw_count": 97,
+        "raw_correct": 92,
+        "other_skill_prior": 0.657678
+      },
+      "296": {
+        "skill_id": "296",
+        "fractional_weight": 375.0,
+        "fractional_correct": 327.0,
+        "empirical_prior": 0.872,
+        "raw_count": 375,
+        "raw_correct": 327,
+        "other_skill_prior": 0.657425
+      },
+      "297": {
+        "skill_id": "297",
+        "fractional_weight": 753.0,
+        "fractional_correct": 450.0,
+        "empirical_prior": 0.59761,
+        "raw_count": 753,
+        "raw_correct": 450,
+        "other_skill_prior": 0.658035
+      },
+      "298": {
+        "skill_id": "298",
+        "fractional_weight": 229.0,
+        "fractional_correct": 193.0,
+        "empirical_prior": 0.842795,
+        "raw_count": 229,
+        "raw_correct": 193,
+        "other_skill_prior": 0.657609
+      },
+      "299": {
+        "skill_id": "299",
+        "fractional_weight": 415.0,
+        "fractional_correct": 126.0,
+        "empirical_prior": 0.303614,
+        "raw_count": 415,
+        "raw_correct": 126,
+        "other_skill_prior": 0.658527
+      },
+      "301": {
+        "skill_id": "301",
+        "fractional_weight": 1249.0,
+        "fractional_correct": 700.0,
+        "empirical_prior": 0.560448,
+        "raw_count": 1249,
+        "raw_correct": 700,
+        "other_skill_prior": 0.658407
+      },
+      "303": {
+        "skill_id": "303",
+        "fractional_weight": 1062.0,
+        "fractional_correct": 599.0,
+        "empirical_prior": 0.56403,
+        "raw_count": 1062,
+        "raw_correct": 599,
+        "other_skill_prior": 0.658299
+      },
+      "307": {
+        "skill_id": "307",
+        "fractional_weight": 752.0,
+        "fractional_correct": 632.0,
+        "empirical_prior": 0.840426,
+        "raw_count": 752,
+        "raw_correct": 632,
+        "other_skill_prior": 0.657147
+      },
+      "308": {
+        "skill_id": "308",
+        "fractional_weight": 653.0,
+        "fractional_correct": 393.0,
+        "empirical_prior": 0.601838,
+        "raw_count": 653,
+        "raw_correct": 393,
+        "other_skill_prior": 0.657992
+      },
+      "309": {
+        "skill_id": "309",
+        "fractional_weight": 1818.0,
+        "fractional_correct": 1164.0,
+        "empirical_prior": 0.640264,
+        "raw_count": 1818,
+        "raw_correct": 1164,
+        "other_skill_prior": 0.65797
+      },
+      "310": {
+        "skill_id": "310",
+        "fractional_weight": 2668.0,
+        "fractional_correct": 1626.0,
+        "empirical_prior": 0.609445,
+        "raw_count": 2668,
+        "raw_correct": 1626,
+        "other_skill_prior": 0.658447
+      },
+      "311": {
+        "skill_id": "311",
+        "fractional_weight": 13734.0,
+        "fractional_correct": 8916.0,
+        "empirical_prior": 0.649192,
+        "raw_count": 13734,
+        "raw_correct": 8916,
+        "other_skill_prior": 0.658428
+      },
+      "312": {
+        "skill_id": "312",
+        "fractional_weight": 3846.0,
+        "fractional_correct": 2409.0,
+        "empirical_prior": 0.626365,
+        "raw_count": 3846,
+        "raw_correct": 2409,
+        "other_skill_prior": 0.658411
+      },
+      "314": {
+        "skill_id": "314",
+        "fractional_weight": 242.0,
+        "fractional_correct": 151.0,
+        "empirical_prior": 0.623967,
+        "raw_count": 242,
+        "raw_correct": 151,
+        "other_skill_prior": 0.657854
+      },
+      "317": {
+        "skill_id": "317",
+        "fractional_weight": 186.0,
+        "fractional_correct": 138.0,
+        "empirical_prior": 0.741935,
+        "raw_count": 186,
+        "raw_correct": 138,
+        "other_skill_prior": 0.657738
+      },
+      "32": {
+        "skill_id": "32",
+        "fractional_weight": 228.0,
+        "fractional_correct": 216.0,
+        "empirical_prior": 0.947368,
+        "raw_count": 228,
+        "raw_correct": 216,
+        "other_skill_prior": 0.657494
+      },
+      "321": {
+        "skill_id": "321",
+        "fractional_weight": 7.5,
+        "fractional_correct": 1.5,
+        "empirical_prior": 0.2,
+        "raw_count": 15,
+        "raw_correct": 3,
+        "other_skill_prior": 0.657831
+      },
+      "322": {
+        "skill_id": "322",
+        "fractional_weight": 809.0,
+        "fractional_correct": 435.0,
+        "empirical_prior": 0.537701,
+        "raw_count": 809,
+        "raw_correct": 435,
+        "other_skill_prior": 0.658287
+      },
+      "323": {
+        "skill_id": "323",
+        "fractional_weight": 902.0,
+        "fractional_correct": 791.0,
+        "empirical_prior": 0.87694,
+        "raw_count": 1056,
+        "raw_correct": 910,
+        "other_skill_prior": 0.656853
+      },
+      "324": {
+        "skill_id": "324",
+        "fractional_weight": 30.0,
+        "fractional_correct": 21.0,
+        "empirical_prior": 0.7,
+        "raw_count": 30,
+        "raw_correct": 21,
+        "other_skill_prior": 0.657808
+      },
+      "325": {
+        "skill_id": "325",
+        "fractional_weight": 1603.0,
+        "fractional_correct": 666.0,
+        "empirical_prior": 0.415471,
+        "raw_count": 1603,
+        "raw_correct": 666,
+        "other_skill_prior": 0.65971
+      },
+      "331": {
+        "skill_id": "331",
+        "fractional_weight": 9.0,
+        "fractional_correct": 3.0,
+        "empirical_prior": 0.333333,
+        "raw_count": 9,
+        "raw_correct": 3,
+        "other_skill_prior": 0.657828
+      },
+      "333": {
+        "skill_id": "333",
+        "fractional_weight": 84.0,
+        "fractional_correct": 61.0,
+        "empirical_prior": 0.72619,
+        "raw_count": 84,
+        "raw_correct": 61,
+        "other_skill_prior": 0.657786
+      },
+      "334": {
+        "skill_id": "334",
+        "fractional_weight": 5.0,
+        "fractional_correct": 2.0,
+        "empirical_prior": 0.4,
+        "raw_count": 5,
+        "raw_correct": 2,
+        "other_skill_prior": 0.65782
+      },
+      "34": {
+        "skill_id": "34",
+        "fractional_weight": 810.5,
+        "fractional_correct": 437.0,
+        "empirical_prior": 0.539173,
+        "raw_count": 1189,
+        "raw_correct": 643,
+        "other_skill_prior": 0.658282
+      },
+      "340": {
+        "skill_id": "340",
+        "fractional_weight": 18.0,
+        "fractional_correct": 16.0,
+        "empirical_prior": 0.888889,
+        "raw_count": 18,
+        "raw_correct": 16,
+        "other_skill_prior": 0.657794
+      },
+      "343": {
+        "skill_id": "343",
+        "fractional_weight": 29.0,
+        "fractional_correct": 18.0,
+        "empirical_prior": 0.62069,
+        "raw_count": 29,
+        "raw_correct": 18,
+        "other_skill_prior": 0.657819
+      },
+      "346": {
+        "skill_id": "346",
+        "fractional_weight": 353.0,
+        "fractional_correct": 235.0,
+        "empirical_prior": 0.665722,
+        "raw_count": 353,
+        "raw_correct": 235,
+        "other_skill_prior": 0.657801
+      },
+      "348": {
+        "skill_id": "348",
+        "fractional_weight": 4.0,
+        "fractional_correct": 2.0,
+        "empirical_prior": 0.5,
+        "raw_count": 4,
+        "raw_correct": 2,
+        "other_skill_prior": 0.657817
+      },
+      "35": {
+        "skill_id": "35",
+        "fractional_weight": 473.5,
+        "fractional_correct": 253.5,
+        "empirical_prior": 0.535375,
+        "raw_count": 947,
+        "raw_correct": 507,
+        "other_skill_prior": 0.658096
+      },
+      "350": {
+        "skill_id": "350",
+        "fractional_weight": 204.0,
+        "fractional_correct": 39.0,
+        "empirical_prior": 0.191176,
+        "raw_count": 204,
+        "raw_correct": 39,
+        "other_skill_prior": 0.658276
+      },
+      "356": {
+        "skill_id": "356",
+        "fractional_weight": 24.0,
+        "fractional_correct": 3.0,
+        "empirical_prior": 0.125,
+        "raw_count": 24,
+        "raw_correct": 3,
+        "other_skill_prior": 0.657876
+      },
+      "362": {
+        "skill_id": "362",
+        "fractional_weight": 50.0,
+        "fractional_correct": 38.0,
+        "empirical_prior": 0.76,
+        "raw_count": 50,
+        "raw_correct": 38,
+        "other_skill_prior": 0.657789
+      },
+      "365": {
+        "skill_id": "365",
+        "fractional_weight": 27.0,
+        "fractional_correct": 13.0,
+        "empirical_prior": 0.481481,
+        "raw_count": 27,
+        "raw_correct": 13,
+        "other_skill_prior": 0.657837
+      },
+      "367": {
+        "skill_id": "367",
+        "fractional_weight": 112.0,
+        "fractional_correct": 57.0,
+        "empirical_prior": 0.508929,
+        "raw_count": 112,
+        "raw_correct": 57,
+        "other_skill_prior": 0.657895
+      },
+      "368": {
+        "skill_id": "368",
+        "fractional_weight": 1453.0,
+        "fractional_correct": 888.0,
+        "empirical_prior": 0.611149,
+        "raw_count": 1453,
+        "raw_correct": 888,
+        "other_skill_prior": 0.658145
+      },
+      "37": {
+        "skill_id": "37",
+        "fractional_weight": 808.0833,
+        "fractional_correct": 372.5833,
+        "empirical_prior": 0.46107,
+        "raw_count": 2736,
+        "raw_correct": 1245,
+        "other_skill_prior": 0.658587
+      },
+      "371": {
+        "skill_id": "371",
+        "fractional_weight": 95.0,
+        "fractional_correct": 61.0,
+        "empirical_prior": 0.642105,
+        "raw_count": 95,
+        "raw_correct": 61,
+        "other_skill_prior": 0.657821
+      },
+      "375": {
+        "skill_id": "375",
+        "fractional_weight": 772.0,
+        "fractional_correct": 463.5,
+        "empirical_prior": 0.600389,
+        "raw_count": 1544,
+        "raw_correct": 927,
+        "other_skill_prior": 0.65803
+      },
+      "378": {
+        "skill_id": "378",
+        "fractional_weight": 278.0,
+        "fractional_correct": 182.0,
+        "empirical_prior": 0.654676,
+        "raw_count": 278,
+        "raw_correct": 182,
+        "other_skill_prior": 0.657818
+      },
+      "39": {
+        "skill_id": "39",
+        "fractional_weight": 945.0,
+        "fractional_correct": 657.0,
+        "empirical_prior": 0.695238,
+        "raw_count": 945,
+        "raw_correct": 657,
+        "other_skill_prior": 0.657642
+      },
+      "4": {
+        "skill_id": "4",
+        "fractional_weight": 1494.0,
+        "fractional_correct": 1075.0,
+        "empirical_prior": 0.719545,
+        "raw_count": 1494,
+        "raw_correct": 1075,
+        "other_skill_prior": 0.657364
+      },
+      "40": {
+        "skill_id": "40",
+        "fractional_weight": 1478.0,
+        "fractional_correct": 1026.0,
+        "empirical_prior": 0.694181,
+        "raw_count": 1478,
+        "raw_correct": 1026,
+        "other_skill_prior": 0.657552
+      },
+      "42": {
+        "skill_id": "42",
+        "fractional_weight": 488.0,
+        "fractional_correct": 322.0,
+        "empirical_prior": 0.659836,
+        "raw_count": 488,
+        "raw_correct": 322,
+        "other_skill_prior": 0.657809
+      },
+      "43": {
+        "skill_id": "43",
+        "fractional_weight": 5.0,
+        "fractional_correct": 0.0,
+        "empirical_prior": 0.0,
+        "raw_count": 5,
+        "raw_correct": 0,
+        "other_skill_prior": 0.65783
+      },
+      "46": {
+        "skill_id": "46",
+        "fractional_weight": 4180.5,
+        "fractional_correct": 2930.0,
+        "empirical_prior": 0.700873,
+        "raw_count": 4672,
+        "raw_correct": 3190,
+        "other_skill_prior": 0.656925
+      },
+      "47": {
+        "skill_id": "47",
+        "fractional_weight": 14553.75,
+        "fractional_correct": 9209.25,
+        "empirical_prior": 0.632775,
+        "raw_count": 14556,
+        "raw_correct": 9210,
+        "other_skill_prior": 0.659712
+      },
+      "48": {
+        "skill_id": "48",
+        "fractional_weight": 677.0833,
+        "fractional_correct": 362.4167,
+        "empirical_prior": 0.535262,
+        "raw_count": 2344,
+        "raw_correct": 1215,
+        "other_skill_prior": 0.658217
+      },
+      "49": {
+        "skill_id": "49",
+        "fractional_weight": 4828.5,
+        "fractional_correct": 3582.5,
+        "empirical_prior": 0.741949,
+        "raw_count": 5833,
+        "raw_correct": 4342,
+        "other_skill_prior": 0.6558
+      },
+      "5": {
+        "skill_id": "5",
+        "fractional_weight": 772.5,
+        "fractional_correct": 463.5,
+        "empirical_prior": 0.6,
+        "raw_count": 1545,
+        "raw_correct": 927,
+        "other_skill_prior": 0.658031
+      },
+      "50": {
+        "skill_id": "50",
+        "fractional_weight": 5852.5,
+        "fractional_correct": 4656.5,
+        "empirical_prior": 0.795643,
+        "raw_count": 6857,
+        "raw_correct": 5416,
+        "other_skill_prior": 0.653795
+      },
+      "51": {
+        "skill_id": "51",
+        "fractional_weight": 1884.3333,
+        "fractional_correct": 1551.0,
+        "empirical_prior": 0.823103,
+        "raw_count": 2665,
+        "raw_correct": 2073,
+        "other_skill_prior": 0.656292
+      },
+      "53": {
+        "skill_id": "53",
+        "fractional_weight": 390.3333,
+        "fractional_correct": 261.0,
+        "empirical_prior": 0.668659,
+        "raw_count": 1171,
+        "raw_correct": 783,
+        "other_skill_prior": 0.657794
+      },
+      "54": {
+        "skill_id": "54",
+        "fractional_weight": 720.0,
+        "fractional_correct": 506.0,
+        "empirical_prior": 0.702778,
+        "raw_count": 720,
+        "raw_correct": 506,
+        "other_skill_prior": 0.657657
+      },
+      "58": {
+        "skill_id": "58",
+        "fractional_weight": 2510.5,
+        "fractional_correct": 1931.5,
+        "empirical_prior": 0.769369,
+        "raw_count": 3639,
+        "raw_correct": 2729,
+        "other_skill_prior": 0.656442
+      },
+      "61": {
+        "skill_id": "61",
+        "fractional_weight": 3292.0,
+        "fractional_correct": 2220.0,
+        "empirical_prior": 0.674362,
+        "raw_count": 3292,
+        "raw_correct": 2220,
+        "other_skill_prior": 0.657546
+      },
+      "63": {
+        "skill_id": "63",
+        "fractional_weight": 609.75,
+        "fractional_correct": 484.9167,
+        "empirical_prior": 0.795271,
+        "raw_count": 1226,
+        "raw_correct": 973,
+        "other_skill_prior": 0.657407
+      },
+      "64": {
+        "skill_id": "64",
+        "fractional_weight": 225.0,
+        "fractional_correct": 192.0,
+        "empirical_prior": 0.853333,
+        "raw_count": 450,
+        "raw_correct": 384,
+        "other_skill_prior": 0.657601
+      },
+      "65": {
+        "skill_id": "65",
+        "fractional_weight": 2467.0,
+        "fractional_correct": 1590.0,
+        "empirical_prior": 0.644507,
+        "raw_count": 2467,
+        "raw_correct": 1590,
+        "other_skill_prior": 0.657975
+      },
+      "67": {
+        "skill_id": "67",
+        "fractional_weight": 4418.0,
+        "fractional_correct": 2937.0,
+        "empirical_prior": 0.66478,
+        "raw_count": 4418,
+        "raw_correct": 2937,
+        "other_skill_prior": 0.657662
+      },
+      "69": {
+        "skill_id": "69",
+        "fractional_weight": 43.0,
+        "fractional_correct": 20.5,
+        "empirical_prior": 0.476744,
+        "raw_count": 86,
+        "raw_correct": 41,
+        "other_skill_prior": 0.657852
+      },
+      "70": {
+        "skill_id": "70",
+        "fractional_weight": 5291.9167,
+        "fractional_correct": 3194.5833,
+        "empirical_prior": 0.603672,
+        "raw_count": 7600,
+        "raw_correct": 4517,
+        "other_skill_prior": 0.659238
+      },
+      "74": {
+        "skill_id": "74",
+        "fractional_weight": 2332.0,
+        "fractional_correct": 1642.5,
+        "empirical_prior": 0.704331,
+        "raw_count": 4664,
+        "raw_correct": 3285,
+        "other_skill_prior": 0.657283
+      },
+      "75": {
+        "skill_id": "75",
+        "fractional_weight": 2945.3333,
+        "fractional_correct": 2341.5,
+        "empirical_prior": 0.794986,
+        "raw_count": 4331,
+        "raw_correct": 3346,
+        "other_skill_prior": 0.65583
+      },
+      "76": {
+        "skill_id": "76",
+        "fractional_weight": 2400.0,
+        "fractional_correct": 920.0,
+        "empirical_prior": 0.383333,
+        "raw_count": 2400,
+        "raw_correct": 920,
+        "other_skill_prior": 0.661041
+      },
+      "77": {
+        "skill_id": "77",
+        "fractional_weight": 5202.5,
+        "fractional_correct": 2974.5,
+        "empirical_prior": 0.571744,
+        "raw_count": 6140,
+        "raw_correct": 3357,
+        "other_skill_prior": 0.660038
+      },
+      "79": {
+        "skill_id": "79",
+        "fractional_weight": 6873.6667,
+        "fractional_correct": 4412.1667,
+        "empirical_prior": 0.641894,
+        "raw_count": 7399,
+        "raw_correct": 4727,
+        "other_skill_prior": 0.658362
+      },
+      "8": {
+        "skill_id": "8",
+        "fractional_weight": 1564.0,
+        "fractional_correct": 1358.0,
+        "empirical_prior": 0.868286,
+        "raw_count": 1564,
+        "raw_correct": 1358,
+        "other_skill_prior": 0.656208
+      },
+      "80": {
+        "skill_id": "80",
+        "fractional_weight": 209.0,
+        "fractional_correct": 134.0,
+        "empirical_prior": 0.641148,
+        "raw_count": 209,
+        "raw_correct": 134,
+        "other_skill_prior": 0.657831
+      },
+      "81": {
+        "skill_id": "81",
+        "fractional_weight": 2540.5,
+        "fractional_correct": 1191.5,
+        "empirical_prior": 0.469002,
+        "raw_count": 2588,
+        "raw_correct": 1209,
+        "other_skill_prior": 0.660166
+      },
+      "82": {
+        "skill_id": "82",
+        "fractional_weight": 1466.0,
+        "fractional_correct": 1099.0,
+        "empirical_prior": 0.749659,
+        "raw_count": 1466,
+        "raw_correct": 1099,
+        "other_skill_prior": 0.657158
+      },
+      "83": {
+        "skill_id": "83",
+        "fractional_weight": 2070.0,
+        "fractional_correct": 1313.0,
+        "empirical_prior": 0.6343,
+        "raw_count": 2070,
+        "raw_correct": 1313,
+        "other_skill_prior": 0.658052
+      },
+      "84": {
+        "skill_id": "84",
+        "fractional_weight": 460.0,
+        "fractional_correct": 343.0,
+        "empirical_prior": 0.745652,
+        "raw_count": 460,
+        "raw_correct": 343,
+        "other_skill_prior": 0.657618
+      },
+      "85": {
+        "skill_id": "85",
+        "fractional_weight": 4029.0,
+        "fractional_correct": 3126.5,
+        "empirical_prior": 0.775999,
+        "raw_count": 5638,
+        "raw_correct": 4261,
+        "other_skill_prior": 0.655463
+      },
+      "86": {
+        "skill_id": "86",
+        "fractional_weight": 2304.0,
+        "fractional_correct": 1720.0,
+        "empirical_prior": 0.746528,
+        "raw_count": 2304,
+        "raw_correct": 1720,
+        "other_skill_prior": 0.656813
+      },
+      "9": {
+        "skill_id": "9",
+        "fractional_weight": 1563.5,
+        "fractional_correct": 1062.5,
+        "empirical_prior": 0.679565,
+        "raw_count": 3127,
+        "raw_correct": 2125,
+        "other_skill_prior": 0.657648
+      },
+      "91": {
+        "skill_id": "91",
+        "fractional_weight": 499.0,
+        "fractional_correct": 336.0,
+        "empirical_prior": 0.673347,
+        "raw_count": 499,
+        "raw_correct": 336,
+        "other_skill_prior": 0.657777
+      },
+      "92": {
+        "skill_id": "92",
+        "fractional_weight": 2721.5,
+        "fractional_correct": 1656.5,
+        "empirical_prior": 0.608672,
+        "raw_count": 4385,
+        "raw_correct": 2871,
+        "other_skill_prior": 0.65847
+      },
+      "94": {
+        "skill_id": "94",
+        "fractional_weight": 1118.0,
+        "fractional_correct": 680.0,
+        "empirical_prior": 0.608229,
+        "raw_count": 1118,
+        "raw_correct": 680,
+        "other_skill_prior": 0.658084
+      },
+      "96": {
+        "skill_id": "96",
+        "fractional_weight": 685.0,
+        "fractional_correct": 422.0,
+        "empirical_prior": 0.616058,
+        "raw_count": 685,
+        "raw_correct": 422,
+        "other_skill_prior": 0.657953
+      },
+      "97": {
+        "skill_id": "97",
+        "fractional_weight": 42.3333,
+        "fractional_correct": 19.0,
+        "empirical_prior": 0.448819,
+        "raw_count": 127,
+        "raw_correct": 57,
+        "other_skill_prior": 0.657857
+      },
+      "99": {
+        "skill_id": "99",
+        "fractional_weight": 42.3333,
+        "fractional_correct": 19.0,
+        "empirical_prior": 0.448819,
+        "raw_count": 127,
+        "raw_correct": 57,
+        "other_skill_prior": 0.657857
+      }
+    }
+  },
+  "g3_other_skill_history": {
+    "annotated_pool_count": 206534,
+    "annotated_pool_correct": 135861,
+    "unannotated_fallback": 0.5,
+    "cold_start_fallback": 0.5,
+    "formula": "P_other = (annotated_pool_correct - sum(same_skill_correct)) / (annotated_pool_count - sum(same_skill_weight))"
+  },
+  "g4_question_difficulty": {
+    "total_questions": 17611,
+    "unseen_question_fallback": {
+      "smoothed_accuracy": 0.658624,
+      "log_interactions": 0.0,
+      "attempts": 0,
+      "correct": 0
+    },
+    "sample_questions_summary": {
+      "min_attempts": 1,
+      "median_attempts": 7,
+      "max_attempts": 129
+    }
+  }
+}
