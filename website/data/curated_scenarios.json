@@ -1,14 +1,14 @@
 [
   {
     "id": "novice_cold_start",
-    "title": "1. The Novice Student (Cold Start)",
-    "description": "A student encountering their first question on the intelligent tutoring platform. With zero previous interactions, all personal history features shrink gracefully to the training-pool global prior.",
-    "student_story": "Brand new student to the platform attempting an average difficulty algebra question for the first time.",
+    "title": "1. Cold-Start Learner (N=0)",
+    "description": "A brand new student attempting their first question. With zero previous interactions, student features collapse to their Bayesian priors, relying on question difficulty.",
+    "student_story": "First interaction on the platform. The model detects higher uncertainty and relies on problem difficulty and domain base rates.",
     "inputs": {
-      "overall_smoothed_accuracy": 0.6586,
-      "weighted_same_skill_smoothed_accuracy": 0.6586,
+      "overall_smoothed_accuracy": 0.658624,
+      "weighted_same_skill_smoothed_accuracy": 0.628947,
       "log_weighted_same_skill_previous_interactions": 0.0,
-      "weighted_other_skill_smoothed_accuracy": 0.6586,
+      "weighted_other_skill_smoothed_accuracy": 0.658558,
       "question_smoothed_accuracy": 0.6626,
       "log_question_previous_interactions": 2.7081,
       "answer_type": "algebra"
@@ -28,9 +28,9 @@
   },
   {
     "id": "high_mastery",
-    "title": "2. Consistent High Performer",
+    "title": "2. High Achiever (Mastery)",
     "description": "A diligent student with substantial platform practice (60 prior questions, 88% overall success) facing a familiar skill where they have consistently performed well.",
-    "student_story": "Advanced student with strong track record encountering a standard equation solving problem.",
+    "student_story": "High volume and high accuracy across both same-skill and cross-skill domains yield high predicted success.",
     "inputs": {
       "overall_smoothed_accuracy": 0.8512,
       "weighted_same_skill_smoothed_accuracy": 0.8385,
@@ -48,16 +48,16 @@
       "question_attempts": 16
     },
     "prediction": {
-      "p_correct": 0.886,
-      "p_risk": 0.114,
+      "p_correct": 0.8860,
+      "p_risk": 0.1140,
       "flagged": false
     }
   },
   {
     "id": "topic_struggler",
     "title": "3. Strong Student, Weak Skill",
-    "description": "A student who excels across general mathematics (78% overall accuracy) but has repeatedly struggled on this specific target skill (only 1 out of 8 correct).",
-    "student_story": "Demonstrates that domain-specific skill history (the top-ranked feature) overrides broad overall competence when predicting struggle.",
+    "description": "A student who excels in general math (78% overall) but has repeatedly struggled on this specific target skill (only 1 out of 8 correct).",
+    "student_story": "Demonstrates that same-skill history (top feature) overrides broad overall competence when predicting imminent failure.",
     "inputs": {
       "overall_smoothed_accuracy": 0.7514,
       "weighted_same_skill_smoothed_accuracy": 0.4215,
@@ -81,37 +81,37 @@
     }
   },
   {
-    "id": "recovering_learner",
-    "title": "4. Learner Improving with Practice",
-    "description": "A student who struggled during early practice but has shown strong improvement over 30 questions, now demonstrating 75% accuracy on recent topic items.",
-    "student_story": "Illustrates the role of Bayesian shrinkage as observation count grows and the student overcomes an initial cold start.",
+    "id": "skill_transfer",
+    "title": "4. Skill Transfer (New Topic)",
+    "description": "A competent student (35/40 correct on other skills) encountering this target skill for the very first time (0 same-skill practice).",
+    "student_story": "Other-skill competence provides a positive baseline, but same-skill history collapses to the domain prior with zero practice volume.",
     "inputs": {
-      "overall_smoothed_accuracy": 0.642,
-      "weighted_same_skill_smoothed_accuracy": 0.7135,
-      "log_weighted_same_skill_previous_interactions": 2.5649,
-      "weighted_other_skill_smoothed_accuracy": 0.612,
-      "question_smoothed_accuracy": 0.655,
+      "overall_smoothed_accuracy": 0.831725,
+      "weighted_same_skill_smoothed_accuracy": 0.628947,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.831712,
+      "question_smoothed_accuracy": 0.6626,
       "log_question_previous_interactions": 2.7081,
       "answer_type": "algebra"
     },
     "unlogged_counts": {
-      "total_questions": 30,
-      "total_correct": 18,
-      "same_skill_questions": 12,
-      "same_skill_correct": 9,
+      "total_questions": 40,
+      "total_correct": 35,
+      "same_skill_questions": 0,
+      "same_skill_correct": 0,
       "question_attempts": 14
     },
     "prediction": {
-      "p_correct": 0.7553,
-      "p_risk": 0.2447,
+      "p_correct": 0.7567,
+      "p_risk": 0.2433,
       "flagged": false
     }
   },
   {
     "id": "threshold_boundary",
-    "title": "5. Near-Threshold Decision Boundary",
-    "description": "A borderline interaction situated precisely near the operational risk threshold (tau = 0.2880), illustrating how the classification decision handles uncertainty.",
-    "student_story": "A student with moderate history attempting an above-average difficulty question, balancing right on the edge of the intervention trigger.",
+    "title": "5. Near-Threshold Boundary",
+    "description": "A borderline interaction situated near the operational risk threshold (tau = 0.2880), illustrating how the classification decision handles uncertainty.",
+    "student_story": "A student with moderate history balancing right on the edge of the intervention trigger.",
     "inputs": {
       "overall_smoothed_accuracy": 0.685,
       "weighted_same_skill_smoothed_accuracy": 0.672,
@@ -129,8 +129,8 @@
       "question_attempts": 11
     },
     "prediction": {
-      "p_correct": 0.644,
-      "p_risk": 0.356,
+      "p_correct": 0.6440,
+      "p_risk": 0.3560,
       "flagged": true
     }
   }

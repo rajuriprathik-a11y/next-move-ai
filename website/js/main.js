@@ -1,12 +1,13 @@
 /**
  * Next Move AI — Main Application Controller
- * Handles navigation, interactive tabs, ablation selector, and scroll interactions.
+ * Handles navigation, interactive tabs, feature group explorer, and scroll interactions.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initAblationSelector();
     initTabControllers();
+    initFeatureGroupTabs();
 });
 
 // Sticky Navigation and ScrollSpy
@@ -17,15 +18,14 @@ function initNavigation() {
     const mobileToggle = document.querySelector('.mobile-nav-toggle');
     const navList = document.querySelector('.nav-links');
 
-    // Sticky header shadow
+    // Sticky header shadow & scrollspy
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 30) {
+        if (window.scrollY > 20) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
 
-        // ScrollSpy
         let currentSectionId = '';
         const scrollY = window.pageYOffset;
 
@@ -95,7 +95,7 @@ function initAblationSelector() {
     });
 }
 
-// Interactive Tab Controllers (e.g. Simulator vs Model Explorer)
+// Interactive Tab Controllers (General)
 function initTabControllers() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabPanels = document.querySelectorAll('.tab-panel');
@@ -109,6 +109,32 @@ function initTabControllers() {
                 b.setAttribute('aria-selected', 'false');
             });
             tabPanels.forEach(p => p.classList.remove('active'));
+
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+        });
+    });
+}
+
+// Interactive Feature Group Tabs (G1, G2, G3, G4)
+function initFeatureGroupTabs() {
+    const ftabBtns = document.querySelectorAll('.feature-group-tab-btn');
+    const ftabPanels = document.querySelectorAll('.feature-panel');
+
+    ftabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-ftab');
+
+            ftabBtns.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            ftabPanels.forEach(p => p.classList.remove('active'));
 
             btn.classList.add('active');
             btn.setAttribute('aria-selected', 'true');

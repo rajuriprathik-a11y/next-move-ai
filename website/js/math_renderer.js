@@ -1,7 +1,7 @@
 /**
  * Next Move AI — Mathematical Rendering Module (KaTeX + Auto-Render)
  * Configures inline \( ... \) and display \[ ... \] mathematics.
- * Handles both initial static HTML and dynamically updated elements.
+ * Handles both initial static HTML, dynamic updates, and details drawer toggles.
  */
 
 const MathRenderer = {
@@ -32,6 +32,15 @@ const MathRenderer = {
             // KaTeX scripts are loaded with defer
             window.addEventListener('load', render);
         }
+
+        // Re-render when details drawers are toggled
+        document.querySelectorAll('details').forEach(d => {
+            d.addEventListener('toggle', () => {
+                if (d.open) {
+                    this.renderElement(d);
+                }
+            });
+        });
     },
 
     renderElement(element) {
