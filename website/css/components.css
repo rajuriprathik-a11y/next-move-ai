@@ -477,55 +477,282 @@
 .bg-danger { background-color: var(--brand-rose); }
 .bg-success { background-color: var(--brand-emerald); }
 
-/* Curated Scenarios Cards */
+/* ==========================================================================
+   Curated Archetype Cards (Refined 3+2 Grid & Interactive Component)
+   ========================================================================== */
+
 .scenarios-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 18px;
+    margin-bottom: 0;
 }
 
+/* Desktop layout (>= 1024px): 3 on row 1, 2 on row 2 */
+@media (min-width: 1024px) {
+    .scenario-card:nth-child(1),
+    .scenario-card:nth-child(2),
+    .scenario-card:nth-child(3) {
+        grid-column: span 2;
+    }
+    .scenario-card:nth-child(4),
+    .scenario-card:nth-child(5) {
+        grid-column: span 3;
+    }
+}
+
+/* Tablet layout (641px - 1023px): 2 on row 1, 2 on row 2, 1 centered on row 3 */
+@media (max-width: 1023px) and (min-width: 641px) {
+    .scenarios-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .scenario-card:nth-child(1),
+    .scenario-card:nth-child(2),
+    .scenario-card:nth-child(3),
+    .scenario-card:nth-child(4) {
+        grid-column: span 1;
+    }
+    .scenario-card:nth-child(5) {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Mobile layout (<= 640px): 1 per row */
+@media (max-width: 640px) {
+    .scenarios-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .scenario-card {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* Scenario Card Surface & Visual Language */
 .scenario-card {
-    background-color: var(--bg-surface);
+    appearance: none;
+    outline: none;
+    background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 18px;
+    padding: 22px 24px;
     text-align: left;
     cursor: pointer;
-    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.22s ease,
+                box-shadow 0.22s ease,
+                background-color 0.22s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .scenario-card:hover {
-    border-color: var(--brand-blue);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    border-color: rgba(56, 189, 248, 0.45);
+    box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(56, 189, 248, 0.2);
 }
 
-.scenario-header {
+/* Selected Active State */
+.scenario-card.is-selected {
+    border-color: var(--brand-blue);
+    background: linear-gradient(180deg, var(--bg-surface) 0%, rgba(56, 189, 248, 0.06) 100%);
+    box-shadow: 0 0 0 2px var(--brand-blue), 0 14px 32px -8px rgba(56, 189, 248, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Top Meta: Number Pill + Status Pill */
+.scenario-meta {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 10px;
 }
 
-.scenario-header h4 {
-    font-size: 0.95rem;
+.archetype-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.scenario-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.scenario-status-pill .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.scenario-status-pill .status-label {
+    font-weight: 600;
+}
+
+.scenario-status-pill .status-val {
+    font-weight: 800;
+}
+
+/* Restrained Risk Status */
+.pill-risk {
+    background-color: var(--status-risk-bg);
+    border: 1px solid var(--status-risk-border);
+    color: var(--status-risk-text);
+}
+.pill-risk .status-dot {
+    background-color: var(--status-risk-text);
+    box-shadow: 0 0 6px var(--status-risk-text);
+}
+
+/* Restrained Cleared Status */
+.pill-safe {
+    background-color: var(--status-safe-bg);
+    border: 1px solid var(--status-safe-border);
+    color: var(--status-safe-text);
+}
+.pill-safe .status-dot {
+    background-color: var(--status-safe-text);
+    box-shadow: 0 0 6px var(--status-safe-text);
+}
+
+/* Heading & Tag */
+.scenario-heading-group {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.scenario-title {
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--text-primary);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin: 0;
 }
 
-.scenario-desc {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-
-.scenario-footer {
-    font-size: 0.78rem;
+.scenario-tag {
+    font-size: 0.76rem;
     font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* Description */
+.scenario-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+/* Parameter Stats Row */
+.scenario-stats-row {
+    display: flex;
+    gap: 14px;
+    padding: 9px 12px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    font-size: 0.78rem;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat-val {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Interaction Cue Footer */
+.scenario-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.84rem;
+    font-weight: 600;
+    margin-top: auto;
+}
+
+.cue-default {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--brand-blue);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.scenario-card:hover .cue-default {
+    color: var(--brand-blue-hover);
+}
+
+.scenario-card:hover .cue-arrow {
+    transform: translateX(4px);
+}
+
+.cue-arrow {
+    transition: transform 0.2s ease;
+}
+
+.cue-active {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    color: var(--brand-blue);
+    font-weight: 700;
+}
+
+.cue-active .active-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--brand-blue);
+    box-shadow: 0 0 6px var(--brand-blue);
+}
+
+/* Selected state overrides */
+.scenario-card.is-selected .cue-default {
+    display: none;
+}
+.scenario-card.is-selected .cue-active {
+    display: inline-flex;
 }
 
 /* Tabs */
@@ -1198,58 +1425,96 @@
     color: var(--brand-blue);
 }
 
-/* Archetype Bar */
+/* Archetype Bar Wrapper & Header */
 .archetype-bar-wrapper {
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 12px 18px;
-    margin-bottom: 18px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
     box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
 }
 
-.archetype-bar-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    margin-bottom: 8px;
+.archetype-bar-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brand-blue) 0%, #38bdf8 50%, var(--brand-purple) 100%);
+    opacity: 0.85;
 }
 
-.archetype-pills-row {
+.archetype-bar-header {
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
-.archetype-pill-btn {
-    appearance: none;
-    background: var(--bg-subtle);
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 0.84rem;
-    font-weight: 600;
+.archetype-bar-title-group {
+    max-width: 760px;
+}
+
+.archetype-bar-eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--brand-blue);
+    margin-bottom: 4px;
+}
+
+.archetype-bar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
     color: var(--text-primary);
-    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.archetype-bar-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.archetype-legend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.legend-item {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: var(--transition);
 }
 
-.archetype-pill-btn:hover {
-    background: var(--brand-blue-light);
-    border-color: var(--brand-blue);
-    color: var(--brand-blue);
-    transform: translateY(-1px);
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
 }
 
-.archetype-pill-btn.active {
-    background: var(--brand-blue);
-    border-color: var(--brand-blue);
-    color: #ffffff;
+.legend-dot.dot-risk {
+    background-color: var(--status-risk-text);
+    box-shadow: 0 0 6px var(--status-risk-text);
+}
+
+.legend-dot.dot-safe {
+    background-color: var(--status-safe-text);
+    box-shadow: 0 0 6px var(--status-safe-text);
 }
 
 /* Two-Column Simulator Layout in First Viewport */
@@ -1538,43 +1803,7 @@ details.tech-drawer summary:focus-visible {
     }
 }
 
-/* Compact Archetype Card Styling for Opening Screen */
-.archetype-bar-wrapper .scenarios-grid {
-    margin-bottom: 0;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-}
-
-.archetype-bar-wrapper .scenario-card {
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--bg-surface);
-}
-
-.archetype-bar-wrapper .scenario-header {
-    margin-bottom: 4px;
-}
-
-.archetype-bar-wrapper .scenario-header h4 {
-    font-size: 0.84rem;
-    font-weight: 700;
-}
-
-.archetype-bar-wrapper .scenario-desc {
-    font-size: 0.76rem;
-    line-height: 1.35;
-    margin-bottom: 4px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.archetype-bar-wrapper .scenario-footer {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--brand-blue);
-}
+/* Compact Archetype Overrides Removed - Replaced with Refined 3+2 Grid */
 
 /* ==========================================================================
    Mobile Overflow Fixes & Confusion Matrix Grid

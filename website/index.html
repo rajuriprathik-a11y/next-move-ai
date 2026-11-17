@@ -7,8 +7,8 @@
     <meta name="description" content="Next Move AI: Predicting student performance on their next learning exercise using chronological interaction history, Bayesian smoothing, and gradient-boosted decision trees.">
     
     <!-- Design System & Stylesheets -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/style.css?v=3.0">
+    <link rel="stylesheet" href="css/components.css?v=3.0">
 
     <!-- Chart.js 4.4.1 for Academic Visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -89,9 +89,21 @@
                     </div>
                 </div>
 
-                <!-- Interactive Archetypes Bar -->
+                <!-- Interactive Archetypes Section -->
                 <div class="archetype-bar-wrapper">
-                    <div class="archetype-bar-title">Click a Student Archetype to Test the Model:</div>
+                    <div class="archetype-bar-header">
+                        <div class="archetype-bar-title-group">
+                            <span class="archetype-bar-eyebrow">Interactive Presets</span>
+                            <h3 class="archetype-bar-title">Select a Student Archetype to Test the Model</h3>
+                            <p class="archetype-bar-subtitle">
+                                Explore how the inference engine responds to diverse learning histories—from cold-start students to topic struggles. Click any card to populate their interaction history into the simulator.
+                            </p>
+                        </div>
+                        <div class="archetype-legend">
+                            <span class="legend-item"><span class="legend-dot dot-risk"></span> Flagged Risk (≥ 28.8%)</span>
+                            <span class="legend-item"><span class="legend-dot dot-safe"></span> Cleared (&lt; 28.8%)</span>
+                        </div>
+                    </div>
                     <div class="scenarios-grid" id="curated-scenarios-container">
                         <!-- Populated dynamically by simulator.js -->
                     </div>
@@ -1497,13 +1509,13 @@ eq P_{\text{global}}\); overall accuracy and other-skill accuracy are never assu
     </footer>
 
     <!-- Application JavaScript Modules -->
-    <script src="js/math_renderer.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/model_inference.js"></script>
-    <script src="js/smoothing_calculator.js"></script>
-    <script src="js/threshold_explorer.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/simulator.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/math_renderer.js?v=3.0"></script>
+    <script src="js/theme.js?v=3.0"></script>
+    <script src="js/model_inference.js?v=3.0"></script>
+    <script src="js/smoothing_calculator.js?v=3.0"></script>
+    <script src="js/threshold_explorer.js?v=3.0"></script>
+    <script src="js/charts.js?v=3.0"></script>
+    <script src="js/simulator.js?v=3.0"></script>
+    <script src="js/main.js?v=3.0"></script>
 </body>
 </html>

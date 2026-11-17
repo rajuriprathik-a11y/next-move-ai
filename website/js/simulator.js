@@ -148,29 +148,101 @@ const Simulator = {
         if (!container) return;
 
         container.innerHTML = '';
-        this.curatedScenarios.forEach(sc => {
+        this.curatedScenarios.forEach((sc, idx) => {
             const card = document.createElement('button');
             card.type = 'button';
-            card.className = 'scenario-card';
+            const isRisk = !!sc.prediction.flagged;
+            const pRiskPct = (sc.prediction.p_risk * 100).toFixed(1);
+            const isSelected = (this.activeScenarioId === sc.id);
+
+            // Clean title and extract parenthetical tag if present
+            let cleanTitle = sc.title.replace(/^\d+\.\s*/, '');
+            let tag = '';
+            if (cleanTitle.includes('(')) {
+                const match = cleanTitle.match(/^(.*?)\s*\((.*?)\)$/);
+                if (match) {
+                    cleanTitle = match[1].trim();
+                    tag = match[2].trim();
+                }
+            }
+
+            const u = sc.unlogged_counts || { total_questions: 0, total_correct: 0, same_skill_questions: 0, same_skill_correct: 0 };
+            const overallAcc = u.total_questions > 0 ? Math.round((u.total_correct / u.total_questions) * 100) : null;
+            const skillAcc = u.same_skill_questions > 0 ? Math.round((u.same_skill_correct / u.same_skill_questions) * 100) : null;
+
+            card.className = `scenario-card ${isRisk ? 'status-risk' : 'status-safe'} ${isSelected ? 'is-selected' : ''}`;
+            card.setAttribute('data-scenario-id', sc.id);
+            card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            card.setAttribute('title', `Simulate archetype: ${cleanTitle}`);
+
             card.innerHTML = `
-                <div class="scenario-header">
-                    <h4>${sc.title}</h4>
-                    <span class="badge ${sc.prediction.flagged ? 'badge-risk' : 'badge-safe'}">
-                        ${sc.prediction.flagged ? 'Flagged Risk' : 'Cleared'} (${(sc.prediction.p_risk * 100).toFixed(1)}%)
+                <div class="scenario-meta">
+                    <span class="archetype-badge">Archetype 0${idx + 1}</span>
+                    <span class="scenario-status-pill ${isRisk ? 'pill-risk' : 'pill-safe'}">
+                        <span class="status-dot"></span>
+                        <span class="status-label">${isRisk ? 'Flagged Risk' : 'Cleared'}</span>
+                        <span class="status-val">${pRiskPct}%</span>
                     </span>
                 </div>
+                <div class="scenario-heading-group">
+                    <h4 class="scenario-title">${cleanTitle}</h4>
+                    ${tag ? `<span class="scenario-tag">${tag}</span>` : ''}
+                </div>
                 <p class="scenario-desc">${sc.description}</p>
+                <div class="scenario-stats-row">
+                    <div class="stat-item" title="Overall Practice History">
+                        <span class="stat-label">Overall:</span>
+                        <span class="stat-val">${u.total_questions > 0 ? `${u.total_correct}/${u.total_questions} (${overallAcc}%)` : '0 Qs (Prior)'}</span>
+                    </div>
+                    <div class="stat-item" title="Target Skill Practice History">
+                        <span class="stat-label">Target Skill:</span>
+                        <span class="stat-val">${u.same_skill_questions > 0 ? `${u.same_skill_correct}/${u.same_skill_questions} (${skillAcc}%)` : '0 Qs (Prior)'}</span>
+                    </div>
+                </div>
                 <div class="scenario-footer">
-                    <span>Click to load into simulator →</span>
+                    <span class="cue-default">
+                        <span>Try this scenario</span>
+                        <svg class="cue-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="cue-active">
+                        <span class="active-dot"></span>
+                        <span>Currently Active</span>
+                    </span>
                 </div>
             `;
 
-            card.addEventListener('click', () => this.loadScenario(sc));
+            card.addEventListener('click', () => {
+                this.loadScenario(sc);
+            });
             container.appendChild(card);
         });
     },
 
+    updateSelectedArchetypeUI(selectedId) {
+        const container = document.getElementById('curated-scenarios-container');
+        if (!container) return;
+        container.querySelectorAll('.scenario-card').forEach(card => {
+            const cardId = card.getAttribute('data-scenario-id');
+            const isMatch = (cardId === selectedId);
+            card.classList.toggle('is-selected', isMatch);
+            card.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+        });
+    },
+
+    clearActiveArchetype() {
+        this.activeScenarioId = null;
+        const container = document.getElementById('curated-scenarios-container');
+        if (!container) return;
+        container.querySelectorAll('.scenario-card').forEach(card => {
+            card.classList.remove('is-selected');
+            card.setAttribute('aria-pressed', 'false');
+        });
+    },
+
     loadScenario(scenario) {
+        this.activeScenarioId = scenario.id;
+        this.updateSelectedArchetypeUI(scenario.id);
+
         // Switch to catalog mode if needed or set inputs
         const u = scenario.unlogged_counts;
         if (u) {
@@ -191,10 +263,10 @@ const Simulator = {
             formatSelect.value = scenario.inputs.answer_type;
         }
 
-        // Scroll smoothly to simulator inputs
+        // Smoothly ensure simulator results are visible without abrupt jumping
         const simEl = document.getElementById('student-simulator');
         if (simEl) {
-            simEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            simEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         this.runSimulation();
@@ -310,6 +382,7 @@ const Simulator = {
         const simReset = document.getElementById('sim-reset-btn');
         if (simReset) {
             simReset.addEventListener('click', () => {
+                this.clearActiveArchetype();
                 this.setVal('sim-total-n', 30);
                 this.setVal('sim-total-c', 21);
                 this.setVal('sim-skill-n', 8);
