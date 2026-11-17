@@ -64,13 +64,10 @@
 Let $s \in \mathcal{S}$ denote a student and let $t$ index the chronological sequence of interactions for student $s$, ordered strictly by the global sequence identifier `order_id`.
 
 For each target interaction at step $t$:
-- **Input Features $\mathbf{x}_{s,t}$:** A feature vector constructed exclusively from information generated strictly prior to interaction $t$ (i.e., interactions with `order_id` strictly smaller than the target `order_id` for student $s$, or prior interactions from other students when estimating question difficulty).
-- **Target Label $y_{s,t} \in \{0, 1\}$:** Recorded binary outcome in column `correct`:
-  $$y_{s,t} = \begin{cases} 1 & \text{if the interaction outcome was recorded as correct} \\ 0 & \text{if the interaction outcome was recorded as non-correct} \end{cases}$$
-- **Model Output $\hat{p}_{s,t}$:** Estimated probability of a correct interaction outcome:
-  $$\hat{p}_{s,t} = P(y_{s,t} = 1 \mid \mathbf{x}_{s,t})$$
-- **Failure Risk Probability $r_{s,t}$:** The complementary probability representing the risk of interaction failure:
-  $$r_{s,t} = P(y_{s,t} = 0 \mid \mathbf{x}_{s,t}) = 1 - \hat{p}_{s,t}$$
+- **Input Features ($\mathbf{x}_{s,t}$):** A feature vector constructed exclusively from information generated strictly prior to interaction $t$ (i.e., interactions with `order_id` strictly smaller than the target `order_id` for student $s$, or prior interactions from other students when estimating question difficulty).
+- **Target Label ($y_{s,t} \in \{0, 1\}$):** Recorded binary outcome in column `correct` ($1$ if the interaction outcome was recorded as correct; $0$ if recorded as non-correct).
+- **Model Output ($\hat{p}_{s,t}$):** Estimated probability of a correct interaction outcome: $\hat{p}_{s,t} = P(y_{s,t} = 1 \mid \mathbf{x}_{s,t})$.
+- **Failure Risk Probability ($r_{s,t}$):** The complementary probability representing the risk of interaction failure: $r_{s,t} = P(y_{s,t} = 0 \mid \mathbf{x}_{s,t}) = 1 - \hat{p}_{s,t}$.
 
 ### Interaction-Level vs. Student-Level Distinction
 
@@ -157,8 +154,7 @@ flowchart TD
 Strict measures were implemented to prevent target and temporal data leakage:
 
 1. **Chronological Sorting:** All interactions are sorted by `user_id` and ascending `order_id`.
-2. **Past-Only Historical Windows:** For student $s$ at question index $t$, historical counters evaluate only interactions where:
-   $$\text{order_id} < \text{order_id}_{s,t}$$
+2. **Past-Only Historical Windows:** For student $s$ at question index $t$, historical counters evaluate only interactions with strictly earlier sequence IDs: $\text{order\_id} < \text{order\_id}_{s,t}$.
 3. **Cumulative Outcome Shifting:** Historical correct counts apply a 1-step lag (`cumsum().shift(1, fill_value=0)`). The current target outcome $y_{s,t}$ is never included in its own historical features.
 4. **Exclusion of `attempt_count`:** The `attempt_count` column records the total number of submissions made by the student on that specific question interaction. Because this count is determined during or after the question attempt, using the current row's `attempt_count` as a predictor would introduce severe post-target leakage; it is strictly excluded from all feature engineering pipelines.
 5. **Question Difficulty Isolation:** When calculating the difficulty of `problem_id` for student $s$, all historical attempts made by student $s$ on that problem are subtracted from the question's cumulative counters. Thus, student $s$'s past success or struggle on that exact question cannot leak into their question difficulty estimate.
@@ -178,6 +174,7 @@ Standard random interaction splits cause severe identity leakage in educational 
 | **Total** | 100% | 4,217 | 275,458 |
 
 Zero student overlap exists between the training pool and the test set:
+
 $$\mathcal{S}_{\text{train}} \cap \mathcal{S}_{\text{test}} = \emptyset$$
 
 ### 6.2 Five-Fold Student-Grouped Cross-Validation

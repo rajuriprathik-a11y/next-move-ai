@@ -166,36 +166,47 @@ def add_same_skill_history_features(data, alpha=10, prior_data=None):
                 skill, []
             ).append(pos)
 
+    skill_prior_order_ids = {
+        skill: prior_order_ids[positions]
+        for skill, positions in skill_prior_positions.items()
+    }
+    skill_cum_correct = {
+        skill: np.concatenate([[0], np.cumsum(prior_outcomes[positions])])
+        for skill, positions in skill_prior_positions.items()
+    }
+
     # Store the chronological global prior for every target row.
     global_prior = np.full(n, 0.5)
 
     for pos, current_skills in enumerate(skill_sets):
+        if not current_skills:
+            continue
+        if len(current_skills) == 1:
+            skill = next(iter(current_skills))
+            sp = skill_prior_positions.get(skill)
+            if sp:
+                cutoff = bisect_left(
+                    skill_prior_order_ids[skill], order_ids[pos]
+                )
+                if cutoff > 0:
+                    global_prior[pos] = (
+                        skill_cum_correct[skill][cutoff] / cutoff
+                    )
+        else:
+            matched_prior_positions = set()
+            for skill in current_skills:
+                sp = skill_prior_positions.get(skill)
+                if sp:
+                    cutoff = bisect_left(
+                        skill_prior_order_ids[skill], order_ids[pos]
+                    )
+                    matched_prior_positions.update(sp[:cutoff])
 
-        matched_prior_positions = set()
-
-        for skill in current_skills:
-
-            skill_positions = skill_prior_positions.get(
-                skill, []
-            )
-
-            # Find positions having order_id strictly smaller
-            # than the current target's order_id.
-            cutoff = bisect_left(
-                prior_order_ids[skill_positions],
-                order_ids[pos]
-            ) if skill_positions else 0
-
-            matched_prior_positions.update(
-                skill_positions[:cutoff]
-            )
-
-        if matched_prior_positions:
-            matched_positions = list(matched_prior_positions)
-
-            global_prior[pos] = prior_outcomes[
-                matched_positions
-            ].mean()
+            if matched_prior_positions:
+                matched_positions = list(matched_prior_positions)
+                global_prior[pos] = prior_outcomes[
+                    matched_positions
+                ].mean()
 
     # --------------------------------------------------
     # 2. Calculate the student's previous same-skill history
@@ -535,10 +546,13 @@ def _normalise_other_skill_set(value):
     return set(str(value).split("_"))
 
 
-def _build_binary_skill_index(data):
+def _build_binary_skill_index(data, outcomes=None):
     """
     Map each skill to the positions of questions containing it.
     """
+    if outcomes is None and "correct" in data.columns:
+        outcomes = data["correct"].to_numpy()
+
     skill_index = {}
 
     for position, (order_id, skills) in enumerate(
@@ -553,10 +567,18 @@ def _build_binary_skill_index(data):
 
     for skill, entries in skill_index.items():
         entries.sort(key=lambda x: x[0])
+        orders = np.array([x[0] for x in entries])
+        positions = np.array([x[1] for x in entries], dtype=int)
+        cum_correct = (
+            np.concatenate([[0.0], np.cumsum(outcomes[positions])])
+            if outcomes is not None
+            else None
+        )
 
         result[skill] = (
-            np.array([x[0] for x in entries]),
-            np.array([x[1] for x in entries], dtype=int)
+            orders,
+            positions,
+            cum_correct
         )
 
     return result
@@ -572,7 +594,9 @@ def _query_binary_skill_index(skill_index, target_skills, order_id):
         if skill not in skill_index:
             continue
 
-        skill_orders, positions = skill_index[skill]
+        skill_data = skill_index[skill]
+        skill_orders = skill_data[0]
+        positions = skill_data[1]
 
         cutoff = np.searchsorted(
             skill_orders,
@@ -605,7 +629,7 @@ def _build_other_skill_history_index(data):
         [[0], np.cumsum(eligible_correct)]
     )
 
-    binary_index = _build_binary_skill_index(data)
+    binary_index = _build_binary_skill_index(data, outcomes=outcomes)
 
     fractional_index = _build_fractional_skill_index(data)
 
@@ -759,18 +783,29 @@ def add_other_skill_history_features(
 
         # Previous questions sharing at least one skill
         # with the target question.
-        overlapping_positions = _query_binary_skill_index(
-            student_index["binary_index"],
-            target_skills,
-            order_id
-        )
-
-        overlapping_count = len(overlapping_positions)
-
-        overlapping_correct = sum(
-            student_index["outcomes"][position]
-            for position in overlapping_positions
-        )
+        if len(target_skills) == 1:
+            skill = next(iter(target_skills))
+            if skill in student_index["binary_index"]:
+                s_orders, s_pos, s_cum = student_index["binary_index"][skill]
+                s_cutoff = np.searchsorted(s_orders, order_id, side="left")
+                overlapping_count = s_cutoff
+                overlapping_correct = s_cum[s_cutoff] if s_cum is not None else sum(
+                    student_index["outcomes"][p] for p in s_pos[:s_cutoff]
+                )
+            else:
+                overlapping_count = 0
+                overlapping_correct = 0.0
+        else:
+            overlapping_positions = _query_binary_skill_index(
+                student_index["binary_index"],
+                target_skills,
+                order_id
+            )
+            overlapping_count = len(overlapping_positions)
+            overlapping_correct = sum(
+                student_index["outcomes"][position]
+                for position in overlapping_positions
+            )
 
         # Binary other-skill history
         binary_count = total_count - overlapping_count
@@ -815,22 +850,33 @@ def add_other_skill_history_features(
             )
         )
 
-        global_overlapping_positions = (
-            _query_binary_skill_index(
-                global_index["binary_index"],
-                target_skills,
-                order_id
+        if len(target_skills) == 1:
+            skill = next(iter(target_skills))
+            if skill in global_index["binary_index"]:
+                g_orders, g_pos, g_cum = global_index["binary_index"][skill]
+                g_cutoff = np.searchsorted(g_orders, order_id, side="left")
+                global_overlapping_count = g_cutoff
+                global_overlapping_correct = g_cum[g_cutoff] if g_cum is not None else sum(
+                    global_index["outcomes"][p] for p in g_pos[:g_cutoff]
+                )
+            else:
+                global_overlapping_count = 0
+                global_overlapping_correct = 0.0
+        else:
+            global_overlapping_positions = (
+                _query_binary_skill_index(
+                    global_index["binary_index"],
+                    target_skills,
+                    order_id
+                )
             )
-        )
-
-        global_overlapping_count = len(
-            global_overlapping_positions
-        )
-
-        global_overlapping_correct = sum(
-            global_index["outcomes"][position]
-            for position in global_overlapping_positions
-        )
+            global_overlapping_count = len(
+                global_overlapping_positions
+            )
+            global_overlapping_correct = sum(
+                global_index["outcomes"][position]
+                for position in global_overlapping_positions
+            )
 
         # Binary global other-skill prior
         global_binary_count = (

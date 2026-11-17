@@ -75,12 +75,16 @@ All feature extraction respects strict chronological temporal ordering: only int
 
 ### 3.1 Multi-Skill Credit Attribution
 Questions in ASSISTments may map to multiple skills $\mathcal{K}_q = \{k_1, k_2, \dots\}$. To prevent double-counting student success:
+
 $$w_{s,q} = \frac{1}{|\mathcal{K}_q|}$$
+
 Each interaction contributes fractional evidence $w_{s,q}$ to each associated skill, ensuring $\sum_{k \in \mathcal{K}_q} w_{s,q} = 1$.
 
 ### 3.2 Empirical Bayesian Shrinkage (m-Estimate Formulation)
 When interaction counts are small (cold-start), sample proportions are noisy. We regularize raw empirical rates toward population base rates using empirical Bayesian m-estimates:
+
 $$\hat{\theta} = \frac{C + m \cdot \mu}{N + m}$$
+
 where:
 - $C = \sum y_{s,i}$ is the observed correct evidence count (or weighted credit sum).
 - $N$ is the observed interaction count (or total exposure weight).
@@ -146,6 +150,7 @@ Cross-validation on 219,983 training interactions demonstrated superior performa
 
 ### 5.1 Asymmetric Cost Framing
 In educational tutoring, a **false negative** (failing to detect a struggling student) leads to frustration and disengagement. A **false positive** (offering an unnecessary hint) carries minimal operational cost. Therefore, the decision threshold $\tau$ is chosen to prioritize **Risk Recall**:
+
 $$r_{s,t} = 1 - \hat{p}_{s,t} \ge \tau \implies \text{Flag for Pedagogical Assistance}$$
 
 ### 5.2 Operating Threshold Selection
@@ -186,10 +191,8 @@ The 500 decision trees were exported to a structured Float32 JSON schema (`websi
 To match XGBoost's C++ floating-point behavior:
 1. All split conditions and leaf values are pre-indexed into `Float32Array` buffers using `Math.fround()`.
 2. Decision trees are traversed iteratively without recursion overhead.
-3. Raw leaf margins are accumulated:
-   $$\text{margin} = \sum_{t=1}^{500} \text{leaf}_t(x)$$
-4. Final probability is computed via the logistic sigmoid function:
-   $$\hat{p} = \frac{1}{1 + e^{-\text{margin}}}$$
+3. Raw leaf margins are accumulated: $\text{margin} = \sum_{t=1}^{500} \text{leaf}_t(x)$.
+4. Final probability is computed via the logistic sigmoid function: $\hat{p} = \frac{1}{1 + e^{-\text{margin}}}$.
 
 ### 6.3 Inference Parity Verification
 Automated regression tests (`tests/parity/audit_comprehensive_parity.py` and `tests/parity/audit_js_parity.js`) evaluate 16 synthetic boundary test cases across both Python and JavaScript:
