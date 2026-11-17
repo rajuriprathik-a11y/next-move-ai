@@ -1,5 +1,31 @@
-data/
-.venv/
+# Next Move AI — Git Ignore Rules
+
+# Root-level data directory (large benchmark and processed datasets)
+/data/
+notebooks/**/data/
+
+# Python virtual environments
+/.venv/
+/.test_venv/
+
+# Python bytecode and caches
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+# Environment files
 .env
+.env.*
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+
+# Local archives and website backup folders
+/.archive/
+/scratch/
+/website_phase2_1_backup/
+/website_redesign_backup/

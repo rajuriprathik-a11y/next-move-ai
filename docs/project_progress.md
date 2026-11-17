@@ -65,34 +65,78 @@ Predict whether a student's next eligible main question in the ASSISTments 2009�
 
 - The same student assignments and folds will be reused across all model versions.
 
-## 6. Model Development
+## 6. Model Development Lifecycle & Experimental Milestones
 
-**Status: Not Started**
+**Status: Completed**
 
-Planned progressive experiments:
+The project completed a systematic, staged feature engineering and modeling progression across five distinct information groups, followed by multi-model exploration, threshold optimization, and final test evaluation.
 
-| Version | Planned features | Status |
-|---|---|---|
-| V0 | Global baseline | Pending |
-| V1 | Overall student history | Pending |
-| V2 | Question difficulty | Pending |
-| V3 | Same-skill history | Pending |
-| V4 | Other-skill / multi-skill history | Pending |
+### Summary of Completed Milestones
 
-## 7. Upcoming Tasks
+| Milestone / Experiment | Features Engineered & Evaluated | 5-Fold OOF ROC-AUC | 5-Fold OOF Brier Score | 5-Fold OOF Log Loss | Status |
+|---|---|:---:|:---:|:---:|:---:|
+| **V0: Global Prior Baseline** | Unconditional training-fold base rate ($\hat{p} \approx 0.6586$) | 0.5000 | 0.2248 | 0.6418 | Completed |
+| **V1: Overall Student History** | Cumulative overall smoothed accuracy ($m=10$) + interaction count | 0.6739 | 0.2035 | 0.5944 | Completed |
+| **V2: Same-Skill History** | Cumulative target-skill smoothed accuracy ($m=5$) + fractional multi-skill weighting | 0.6862 | 0.2021 | 0.5903 | Completed |
+| **V3: Other-Skill History** | Cumulative non-target-skill transfer accuracy ($m=10$) | 0.6267 | 0.2137 | 0.6170 | Completed |
+| **V4: Question Difficulty** | Item empirical difficulty ($m=30$) + log exposure + categorical format | 0.6356 | 0.2127 | 0.6150 | Completed |
+| **Combined Feature Set** | 7 unified features across G1–G4 (11 transformed dimensions) | 0.7396 | 0.1868 | 0.5549 | Completed |
+| **Ablation Study (Logistic Regression)** | Full model vs dropping each individual information group | 0.7396 | 0.1868 | 0.5549 | Completed |
+| **Tree-Based Models (Random Forest)** | Non-linear ensemble with bagging and bootstrapping | 0.7468 | 0.1845 | 0.5489 | Completed |
+| **Tree-Based Models (LightGBM)** | Gradient boosting with histogram binning and leaf-wise growth | 0.7473 | 0.1842 | 0.5479 | Completed |
+| **Tree-Based Models (XGBoost Champion)** | Depth-wise tree boosting (500 estimators, depth 5, $\eta=0.03$) | **0.7477** | **0.1840** | **0.5475** | **Champion Selected** |
 
-1. Implement and evaluate the V0 baseline using five-fold cross-validation.
-2. Introduce overall student history features (V1).
-3. Introduce question difficulty features (V2).
-4. Introduce same-skill history features (V3).
-5. Introduce other-skill / multi-skill history features (V4).
-6. Compare all model versions using consistent evaluation metrics.
-7. Train the selected final model using the complete 80% training pool.
-8. Evaluate once on the untouched 20% test set.
-9. Prepare the final report and interactive demonstration.
+---
 
-## 8. Current Project Stage
+## 7. Operational Threshold Optimization ($\tau = 0.2880$)
 
-**Completed:** Dataset audit, cleaning, preparation, and student-level data splitting.
+**Status: Completed**
 
-**Next milestone:** V0 — Baseline Model.
+To operationalize probability predictions into proactive educational interventions, an operational failure-risk threshold $\tau$ was calibrated on the pooled 5-fold Out-of-Fold (OOF) cross-validation predictions:
+- **Optimization Criterion:** Achieve approximately 75% Risk Recall to ensure three out of four struggling student interactions are proactively flagged for instructional assistance.
+- **Calibrated Operating Threshold:** $\tau = 0.2880$ (flag for intervention if predicted failure risk $P(\text{incorrect}) \ge 0.2880$, or equivalently $P(\text{correct}) \le 0.7120$).
+- **5-Fold OOF Cross-Validation Results at $\tau = 0.2880$:**
+  - **Risk Recall:** $75.00\%$ ($56,322$ True Positives / $75,097$ actual risk interactions)
+  - **Specificity:** $59.82\%$ ($86,666$ True Negatives / $144,886$ non-risk interactions)
+  - **Precision:** $49.17\%$ ($56,322$ True Positives / $114,542$ flagged interactions)
+  - **False Positive Rate:** $40.18\%$ ($58,220$ False Positives / $144,886$ non-risk interactions)
+
+---
+
+## 8. Final Champion Retraining & Untouched Held-Out Test Evaluation
+
+**Status: Completed**
+
+The champion XGBoost architecture was refit on the entire 80% training pool ($219,983$ interactions, $3,373$ students) and evaluated exactly once on the untouched 20% held-out test set ($55,475$ interactions, $844$ students):
+
+- **Probabilistic Calibration & Discrimination:**
+  - **ROC-AUC:** `0.746778` (demonstrating consistent generalization on unseen students vs 0.747729 OOF CV)
+  - **Brier Score:** `0.184909` (minimal probability error increase vs 0.184013 OOF CV)
+  - **Log Loss:** `0.549723` (stable probabilistic loss vs 0.547472 OOF CV)
+  - **Average Precision (Risk PR-AUC):** `0.624092`
+- **Downstream Binary Risk Classification ($\tau = 0.2880$):**
+  - **Risk Recall:** `74.72%` ($14,203$ True Positives / $19,008$ actual test risk interactions)
+  - **Specificity:** `60.21%` ($21,956$ True Negatives / $36,467$ non-risk test interactions)
+  - **Precision:** `49.46%` ($14,203$ True Positives / $28,714$ flagged test interactions)
+  - **F1 Score:** `0.5952`
+- **Artifacts Saved:**
+  - Fitted pipeline: `models/final/next_move_xgboost_pipeline.joblib`
+  - Test metrics summary: `models/final/final_evaluation_metrics.json`
+  - Interaction test predictions: `results/test_predictions/xgboost_test_predictions.csv`
+
+---
+
+## 9. Interactive Demonstration & Web Deployment
+
+**Status: Completed**
+
+- **Client-Side Float32 Model Serialization:** Extracted 500 decision trees into structured JSON format (`website/data/xgboost_trees.json`, 2.27 MB) for zero-latency in-browser evaluation.
+- **Interactive Student Outcome Simulator:** Real-time Bayesian smoothing and recursive tree traversal engine implemented in JavaScript with 100% classification concordance to Python scikit-learn/XGBoost.
+- **Production Web Deployment:** Deployed via GitHub Actions to GitHub Pages at:
+  `https://rajuriprathik-a11y.github.io/next-move-ai/`
+
+---
+
+## 10. Current Project Stage
+
+**Completed:** All developmental, experimental, validation, and deployment milestones successfully achieved. Repository restructured into a clean, reproducible, production-grade format.

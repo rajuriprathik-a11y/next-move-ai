@@ -1,0 +1,290 @@
+[
+  {
+    "category": "normal",
+    "id": "normal_1",
+    "sample": {
+      "overall_smoothed_accuracy": 0.725,
+      "weighted_same_skill_smoothed_accuracy": 0.65,
+      "log_weighted_same_skill_previous_interactions": 2.1972245773362196,
+      "weighted_other_skill_smoothed_accuracy": 0.74,
+      "question_smoothed_accuracy": 0.6626,
+      "log_question_previous_interactions": 2.7081,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.7350002527236938,
+      "p_risk": 0.26499974727630615,
+      "flagged": false
+    }
+  },
+  {
+    "category": "normal",
+    "id": "normal_2",
+    "sample": {
+      "overall_smoothed_accuracy": 0.85,
+      "weighted_same_skill_smoothed_accuracy": 0.9,
+      "log_weighted_same_skill_previous_interactions": 2.772588722239781,
+      "weighted_other_skill_smoothed_accuracy": 0.82,
+      "question_smoothed_accuracy": 0.5842,
+      "log_question_previous_interactions": 2.5649,
+      "answer_type": "fill_in_1"
+    },
+    "python_prediction": {
+      "p_correct": 0.8307279944419861,
+      "p_risk": 0.16927200555801392,
+      "flagged": false
+    }
+  },
+  {
+    "category": "normal",
+    "id": "normal_3",
+    "sample": {
+      "overall_smoothed_accuracy": 0.45,
+      "weighted_same_skill_smoothed_accuracy": 0.38,
+      "log_weighted_same_skill_previous_interactions": 1.791759469228055,
+      "weighted_other_skill_smoothed_accuracy": 0.47,
+      "question_smoothed_accuracy": 0.1689,
+      "log_question_previous_interactions": 3.4012,
+      "answer_type": "choose_1"
+    },
+    "python_prediction": {
+      "p_correct": 0.17775225639343262,
+      "p_risk": 0.8222477436065674,
+      "flagged": true
+    }
+  },
+  {
+    "category": "normal",
+    "id": "normal_4",
+    "sample": {
+      "overall_smoothed_accuracy": 0.6,
+      "weighted_same_skill_smoothed_accuracy": 0.62,
+      "log_weighted_same_skill_previous_interactions": 2.5649493574615367,
+      "weighted_other_skill_smoothed_accuracy": 0.59,
+      "question_smoothed_accuracy": 0.8584,
+      "log_question_previous_interactions": 2.8904,
+      "answer_type": "choose_n"
+    },
+    "python_prediction": {
+      "p_correct": 0.8507577776908875,
+      "p_risk": 0.14924222230911255,
+      "flagged": false
+    }
+  },
+  {
+    "category": "normal",
+    "id": "normal_5",
+    "sample": {
+      "overall_smoothed_accuracy": 0.674,
+      "weighted_same_skill_smoothed_accuracy": 0.629,
+      "log_weighted_same_skill_previous_interactions": 1.6094379124341003,
+      "weighted_other_skill_smoothed_accuracy": 0.674,
+      "question_smoothed_accuracy": 0.7586,
+      "log_question_previous_interactions": 2.4849,
+      "answer_type": "open_response"
+    },
+    "python_prediction": {
+      "p_correct": 0.7714583873748779,
+      "p_risk": 0.22854161262512207,
+      "flagged": false
+    }
+  },
+  {
+    "category": "cold_start_student",
+    "id": "cold_start_1",
+    "sample": {
+      "overall_smoothed_accuracy": 0.658624,
+      "weighted_same_skill_smoothed_accuracy": 0.658624,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.658624,
+      "question_smoothed_accuracy": 0.6626,
+      "log_question_previous_interactions": 2.7081,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.5272313356399536,
+      "p_risk": 0.4727686643600464,
+      "flagged": true
+    }
+  },
+  {
+    "category": "cold_start_student",
+    "id": "cold_start_2",
+    "sample": {
+      "overall_smoothed_accuracy": 0.5,
+      "weighted_same_skill_smoothed_accuracy": 0.5,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.5,
+      "question_smoothed_accuracy": 0.5,
+      "log_question_previous_interactions": 1.0986,
+      "answer_type": "fill_in_1"
+    },
+    "python_prediction": {
+      "p_correct": 0.2571690082550049,
+      "p_risk": 0.7428309917449951,
+      "flagged": true
+    }
+  },
+  {
+    "category": "unseen_skill",
+    "id": "unseen_skill_1",
+    "sample": {
+      "overall_smoothed_accuracy": 0.679312,
+      "weighted_same_skill_smoothed_accuracy": 0.5,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.6,
+      "question_smoothed_accuracy": 0.6626,
+      "log_question_previous_interactions": 2.7081,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.5800471901893616,
+      "p_risk": 0.4199528098106384,
+      "flagged": true
+    }
+  },
+  {
+    "category": "unseen_skill",
+    "id": "unseen_skill_2",
+    "sample": {
+      "overall_smoothed_accuracy": 0.7,
+      "weighted_same_skill_smoothed_accuracy": 0.5,
+      "log_weighted_same_skill_previous_interactions": 1.0986122886681098,
+      "weighted_other_skill_smoothed_accuracy": 0.72,
+      "question_smoothed_accuracy": 0.6,
+      "log_question_previous_interactions": 2.1972,
+      "answer_type": "choose_1"
+    },
+    "python_prediction": {
+      "p_correct": 0.5692847967147827,
+      "p_risk": 0.4307152032852173,
+      "flagged": true
+    }
+  },
+  {
+    "category": "missing_skill",
+    "id": "missing_skill_1",
+    "sample": {
+      "overall_smoothed_accuracy": 0.658624,
+      "weighted_same_skill_smoothed_accuracy": 0.5,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.5,
+      "question_smoothed_accuracy": 0.6626,
+      "log_question_previous_interactions": 2.7081,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.5999593734741211,
+      "p_risk": 0.4000406265258789,
+      "flagged": true
+    }
+  },
+  {
+    "category": "multi_skill",
+    "id": "multi_skill_1",
+    "sample": {
+      "overall_smoothed_accuracy": 0.7596068571428571,
+      "weighted_same_skill_smoothed_accuracy": 0.5143355555555557,
+      "log_weighted_same_skill_previous_interactions": 2.1972245773362196,
+      "weighted_other_skill_smoothed_accuracy": 0.6114313513513513,
+      "question_smoothed_accuracy": 0.2098,
+      "log_question_previous_interactions": 3.9318,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.3181142210960388,
+      "p_risk": 0.6818857789039612,
+      "flagged": true
+    }
+  },
+  {
+    "category": "unseen_question",
+    "id": "unseen_question_1",
+    "sample": {
+      "overall_smoothed_accuracy": 0.75,
+      "weighted_same_skill_smoothed_accuracy": 0.7,
+      "log_weighted_same_skill_previous_interactions": 2.3978952727983707,
+      "weighted_other_skill_smoothed_accuracy": 0.76,
+      "question_smoothed_accuracy": 0.658624,
+      "log_question_previous_interactions": 0.0,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.8062290549278259,
+      "p_risk": 0.19377094507217407,
+      "flagged": false
+    }
+  },
+  {
+    "category": "unseen_question",
+    "id": "unseen_question_2",
+    "sample": {
+      "overall_smoothed_accuracy": 0.4,
+      "weighted_same_skill_smoothed_accuracy": 0.35,
+      "log_weighted_same_skill_previous_interactions": 1.6094379124341003,
+      "weighted_other_skill_smoothed_accuracy": 0.42,
+      "question_smoothed_accuracy": 0.658624,
+      "log_question_previous_interactions": 0.0,
+      "answer_type": "fill_in_1"
+    },
+    "python_prediction": {
+      "p_correct": 0.20928317308425903,
+      "p_risk": 0.790716826915741,
+      "flagged": true
+    }
+  },
+  {
+    "category": "boundary",
+    "id": "boundary_zero",
+    "sample": {
+      "overall_smoothed_accuracy": 0.0,
+      "weighted_same_skill_smoothed_accuracy": 0.0,
+      "log_weighted_same_skill_previous_interactions": 0.0,
+      "weighted_other_skill_smoothed_accuracy": 0.0,
+      "question_smoothed_accuracy": 0.05,
+      "log_question_previous_interactions": 0.0,
+      "answer_type": "algebra"
+    },
+    "python_prediction": {
+      "p_correct": 0.007930525578558445,
+      "p_risk": 0.9920694744214416,
+      "flagged": true
+    }
+  },
+  {
+    "category": "boundary",
+    "id": "boundary_max",
+    "sample": {
+      "overall_smoothed_accuracy": 1.0,
+      "weighted_same_skill_smoothed_accuracy": 1.0,
+      "log_weighted_same_skill_previous_interactions": 5.5,
+      "weighted_other_skill_smoothed_accuracy": 1.0,
+      "question_smoothed_accuracy": 0.99,
+      "log_question_previous_interactions": 5.5,
+      "answer_type": "open_response"
+    },
+    "python_prediction": {
+      "p_correct": 0.9207473993301392,
+      "p_risk": 0.07925260066986084,
+      "flagged": false
+    }
+  },
+  {
+    "category": "boundary",
+    "id": "boundary_mixed_high_exp",
+    "sample": {
+      "overall_smoothed_accuracy": 0.95,
+      "weighted_same_skill_smoothed_accuracy": 0.1,
+      "log_weighted_same_skill_previous_interactions": 5.0,
+      "weighted_other_skill_smoothed_accuracy": 0.98,
+      "question_smoothed_accuracy": 0.5,
+      "log_question_previous_interactions": 4.5,
+      "answer_type": "choose_n"
+    },
+    "python_prediction": {
+      "p_correct": 0.5557982921600342,
+      "p_risk": 0.4442017078399658,
+      "flagged": true
+    }
+  }
+]
