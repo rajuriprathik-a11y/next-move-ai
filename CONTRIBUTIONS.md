@@ -131,13 +131,12 @@ Both members jointly collaborated on problem formulation, mathematical derivatio
 
 ---
 
-## 4. Viva / Defense Preparation Cheatsheet
+## 4. AI-Use Disclosure
 
-### Question 1: "Why did you use Bayesian smoothing ($\alpha = 10$) instead of laplace smoothing ($\alpha = 1$)?"
-- **Defense by Rajuri Prathik:** Laplace smoothing ($+1$) assumes a uniform prior ($0.5$), which introduces strong negative bias in educational datasets where the average success rate is $\approx 65.8\%$. Our empirical Bayesian smoothing uses $\alpha = 10$ and shrinks toward the *chronological global prior* $P$. At $N=0$, the estimate cleanly equals $P$; with $\alpha = 10$, a student needs approximately 10 interactions for their personal performance to carry equal weight with the population prior, preventing premature overconfidence.
+In accordance with course academic integrity guidelines for **ES 335: Machine Learning**:
 
-### Question 2: "Why is XGBoost better suited for this task than Logistic Regression or Deep Neural Networks?"
-- **Defense by Manikanta Naidu Uppala:** Logistic Regression is constrained by linear additivity; it cannot capture the interaction where an algebraic format penalizes low-mastery students much more severely than high-mastery students without manual interaction terms. XGBoost automatically discovers these non-linear decision boundaries via histogram-based gradient boosted trees (`tree_method="hist"`), yielding the lowest Log Loss ($0.5471$) and superior calibration without requiring millions of parameters like recurrent neural networks.
+Generative AI tools (**OpenAI ChatGPT** and **Google DeepMind Antigravity / Gemini**) were utilized during this project as productivity and code development assistants:
+- **OpenAI ChatGPT:** Assisting with code generation, syntax drafting, implementation support, and boilerplate structuring across notebooks and scripts.
+- **Antigravity / Gemini:** Assisting with repository auditing, documentation structuring, parity test execution, and verifying temporal leakage constraints.
 
-### Question 3: "How do you guarantee that there is no temporal leakage in your question difficulty feature?"
-- **Defense by Both:** Question difficulty for interaction $t$ of student $s$ on problem $q$ considers only interactions with strictly smaller sequence IDs ($\text{order\_id} < \text{order\_id}_{s,t}$). Crucially, we maintain a secondary student-problem index and subtract all historical attempts made by student $s$ themselves on problem $q$. This guarantees that student $s$'s past success or struggle on that exact question cannot leak into their question difficulty estimate.
+All core problem formulations, mathematical derivations, feature definitions, hyperparameter tuning decisions, experimental executions, and analytical conclusions were verified and approved by the project team.

@@ -633,9 +633,10 @@ next-move-ai/
 
 In accordance with course guidelines for **ES 335: Machine Learning**:
 
-Generative AI assistance (Google DeepMind Antigravity / Gemini) was utilized during this project as a developer productivity and code-structuring tool. Specifically, AI assistance was used for:
-1. Auditing codebase consistency, documentation completeness, and checking for potential data leakage.
-2. Drafting modular code templates for feature engineering and cross-validation assertions.
-3. Structuring and formatting academic markdown documentation and data visualization scripts.
+Generative AI tools (**OpenAI ChatGPT** and **Google DeepMind Antigravity / Gemini**) were utilized during this project as developer productivity and coding assistants. Specifically, AI assistance was used for:
+1. **Code Generation & Implementation:** Assisting with code generation, syntax drafting, and boilerplate structuring using OpenAI ChatGPT.
+2. **Codebase Auditing:** Auditing codebase consistency, dependency environments, and verifying temporal leakage prevention.
+3. **Template & Testing Development:** Drafting modular code templates for feature engineering and automated assertion suites.
+4. **Documentation & Formatting:** Structuring academic markdown documentation, LaTeX math formatting, and data visualization scripts.
 
 All core problem formulations, data cleaning strategies, feature definitions, hyperparameter tuning decisions, experimental executions, and analytical conclusions were verified and approved by the project team.
