@@ -5,11 +5,16 @@
 **Dataset:** ASSISTments 2009–2010 Skill Builder  
 **Primary Task:** Binary Classification (Next-Interaction Outcome Prediction)  
 **Primary Deliverable:** Interaction-level probability estimation & risk-of-failure classification  
+**Team Members (Equal 50% / 50% Partnership):**  
+- **Rajuri Prathik** (Roll Number: `25110262`)
+- **Manikanta Naidu Uppala** (Roll Number: `25110330`)
+- **Comprehensive Defense Document:** [CONTRIBUTIONS.md](CONTRIBUTIONS.md)
 
 ---
 
 ## Table of Contents
 
+- [Team Members & Contribution Breakdown](#team-members--contribution-breakdown)
 - [1. Project Overview](#1-project-overview)
 - [2. Problem Formulation](#2-problem-formulation)
 - [3. Dataset Description & Access](#3-dataset-description-access)
@@ -43,6 +48,19 @@
 - [17. Repository Structure](#17-repository-structure)
 - [18. References & Acknowledgements](#18-references-acknowledgements)
 - [19. AI-Use Disclosure](#19-ai-use-disclosure)
+
+---
+
+## Team Members & Contribution Breakdown
+
+This project was developed, architected, and validated as an equal partnership (**50% / 50%**) between two team members for **ES 335: Machine Learning**:
+
+| Student Name | Roll Number | Primary Module Ownership & Key Contributions | Effort Share |
+|---|:---:|---|:---:|
+| **Rajuri Prathik** | `25110262` | Data engineering, temporal leakage prevention framework, Bayesian $m$-estimate smoothing ($\alpha = 10$), student historical features (Groups G1 & G2), reusable `src/` package, and client-side Float32 browser simulator (`website/`). | **50%** |
+| **Manikanta Naidu Uppala** | `25110330` | Item difficulty & transfer modeling (Groups G3 & G4), multimodal feature synthesis, systematic feature ablation study, tree-based ensemble modeling (Random Forest, LightGBM, XGBoost), asymmetric operational risk thresholding ($\tau = 0.2880$), and holdout test set evaluation. | **50%** |
+
+> For the comprehensive individual breakdown, technical justifications, limitations, defense reasoning for small parameter/protocol changes, and the 26-notebook responsibility matrix adhering to the project defense rubric, see the dedicated **[CONTRIBUTIONS.md](CONTRIBUTIONS.md)** file.
 
 ---
 
